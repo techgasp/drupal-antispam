@@ -1,0 +1,5 @@
+spammaster.form:
+  title: 'Spam Master'
+  parent: system.admin_config_system
+  description: 'Configure Spam Master Settings.'
+  route_name: spammaster.form

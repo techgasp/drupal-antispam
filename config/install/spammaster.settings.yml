@@ -1,0 +1,21 @@
+spammaster:
+  version:
+  type:
+  license_key:
+  license_status:
+  license_alert_level:
+  license_protection:
+  license_probability:
+  block_message: 'Your Email, Domain, or Ip are banned.'
+  basic_firewall: '1'
+  basic_registration: '1'
+  basic_comment: '1'
+  basic_contact: '1'
+  signature_registration: '1'
+  signature_login: '1'
+  signature_comment: '1'
+  signature_contact: '1'
+  email_alert_3: '1'
+  email_daily_report: '0'
+  email_weekly_report: '0'
+  email_improve: '1'

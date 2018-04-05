@@ -1,0 +1,56 @@
+spammaster.form:
+  path: '/admin/config/system/spammaster'
+  defaults:
+    _form: 'Drupal\spammaster\Form\SpamMasterSettingsForm'
+    _title: 'Spam Master Settings'
+  requirements:
+    _permission: 'administer site configuration'
+spammaster.spammasterdailycron:
+  path: '/spammaster'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterCronController::spammasterdailycron'
+    _title: 'Spam Master Cron Controller'
+  requirements:
+    _permission: 'access content'
+spammaster.spammasterlictrialcreation:
+  path: '/spammaster'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterMailController::spammasterlictrialcreation'
+    _title: 'Spam Master Mail Controller'
+  requirements:
+    _permission: 'access content'
+spammaster.spammasterlicmanualcreation:
+  path: '/spammaster'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterLicController::spammasterlicmanualcreation'
+    _title: 'Spam Master Lic Controller'
+  requirements:
+    _permission: 'access content'
+spammaster.spammasterregistrationcheck:
+  path: '/spammaster'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterRegistrationController::spammasterregistrationcheck'
+    _title: 'Spam Master Registration Controller'
+  requirements:
+    _permission: 'access content'
+spammaster.spammastercommentcheck:
+  path: '/spammaster'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterCommentController::spammastercommentcheck'
+    _title: 'Spam Master Comment Controller'
+  requirements:
+    _permission: 'access content'
+spammaster.spammastercontactcheck:
+  path: '/spammaster'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterContactController::spammastercontactcheck'
+    _title: 'Spam Master Contact Controller'
+  requirements:
+    _permission: 'access content'
+spammaster.content:
+  path: '/firewall'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterFirewallController::content'
+    _title: 'Spam Master Firewall'
+  requirements:
+    _permission: 'access content'

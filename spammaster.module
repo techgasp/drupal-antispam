@@ -1,0 +1,289 @@
+<?php
+
+/**
+ * @file
+ * Spam Master code implementation.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\spammaster\Controller\SpamMasterCronController;
+use Drupal\spammaster\Controller\SpamMasterRegistrationController;
+use Drupal\spammaster\Controller\SpamMasterCommentController;
+use Drupal\spammaster\Controller\SpamMasterContactController;
+
+/**
+ * Implements hook_help().
+ */
+function spammaster_help($process_name, RouteMatchInterface $route_match) {
+  switch ($process_name) {
+    case 'help.page.spammaster':
+      $output_help = '<h3>' . t('About') . '</h3>';
+      $output_help .= '<p>' . t('Spam Master scans and blocks new Drupal user registrations, comments and threads.') . '</p>';
+      $output_help .= '<p>' . t('Spam Master uses real time anti-spam blocking lists provided by https://spammaster.techgasp.com.') . '</p>';
+      $output_help .= '<p>' . t('Spam Master checks ips, ranges, emails, domains and words or text via heuristics.') . '</p>';
+      $output_help .= '<p>' . t('Spam Master can be implemented on new registrations, logins, new comments and threads.') . '</p>';
+      $output_help .= '<h3>' . t('Options') . '</h3>';
+      $output_help .= '<p>' . t('Spam Master is packed with otions and statistics, please visit the module configuration page.') . '</p>';
+      $output_help .= '<h3>' . t('Configuration') . '</h3>';
+      $output_help .= '<p>' . t('All settings are available via module settings, configuration page, link below.') . '</p>';
+      $output_help .= '<p>' . t('Visit the project <a href="@spammaster_url">Spam Master</a>.', ['@spammaster_url' => 'https://spammaster.techgasp.com/']) . '</p>';
+      $output_help .= '<h3>' . t('More') . '</h3>';
+      $output_help .= '<p>' . t('Future versions may include several types of API enhacements.') . '</p>';
+      return $output_help;
+  }
+}
+
+/**
+ * Implements cron().
+ */
+function spammaster_cron() {
+
+  // Implements cron crontroller.
+  $spammaster_cron_controller = new SpamMasterCronController();
+
+  // Implements daily cron.
+  if (REQUEST_TIME - \Drupal::state()->get('spammaster.daily_con') >= 86400) {
+    \Drupal::state()->set('spammaster.daily_con', REQUEST_TIME);
+
+    // CronController Call.
+    $spammaster_daily_cron = $spammaster_cron_controller->spammasterdailycron();
+
+    // Watchdog log.
+    \Drupal::logger('spammaster')->notice('Spam Master: daily cron run successfully');
+  }
+
+  // Implements weekly cron.
+  if (REQUEST_TIME - \Drupal::state()->get('spammaster.weekly_con') >= 518400) {
+    \Drupal::state()->set('spammaster.weekly_con', REQUEST_TIME);
+
+    // CronController Call.
+    $spammaster_weekly_cron = $spammaster_cron_controller->spammasterweeklycron();
+
+    // Watchdog log.
+    \Drupal::logger('spammaster')->notice('Spam Master: weekly cron run successfully');
+  }
+}
+
+/**
+ * Implements firewall theme().
+ */
+function spammaster_theme($existing, $type, $theme, $path) {
+
+  return [
+    'firewall' => [
+      'variables' => [],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_mail().
+ */
+function spammaster_mail($key, &$message, $params) {
+
+  $options = [
+    'langcode' => $message['langcode'],
+  ];
+  switch ($key) {
+    case 'license_trial_create':
+      $spammaster_subject_title = 'Congratulations!!!';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+    case 'license_trial_end':
+      $spammaster_subject_title = 'License Expired!!!';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+    case 'license_full_end':
+      $spammaster_subject_title = 'License Expired!!!';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+    case 'license_malfunction':
+      $spammaster_subject_title = 'Warning!!! License Malfunction';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+    case 'lic_alert_level_3':
+      $spammaster_subject_title = 'Warning!!! Your site is in Alert Level 3';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+    case 'mail_daily_report':
+      $spammaster_subject_title = 'Daily Report';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+    case 'mail_weekly_report':
+      $spammaster_subject_title = 'Weekly Report';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+    case 'mail_help_report':
+      $spammaster_subject_title = 'Weekly Report';
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $spammaster_subject_title;
+      $message['body'][] = $params['message'];
+      break;
+
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function spammaster_form_user_login_form_alter(&$form, &$form_state, $form_id) {
+  $spammaster_settings = \Drupal::config('spammaster.settings');
+  $signature_login = $spammaster_settings->get('spammaster.signature_login');
+  if ($signature_login != 0) {
+    $form['spammaster_signature_login'] = [
+      '#type' => 'item',
+      '#markup' => t("<a href='https://spammaster.techgasp.com' target='_blank'>Protected by Spam Master</a>"),
+      '#required' => FALSE,
+      '#weight' => 999,
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function spammaster_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+  $spammaster_settings = \Drupal::config('spammaster.settings');
+  $signature_registration = $spammaster_settings->get('spammaster.signature_registration');
+  $basic_registration = $spammaster_settings->get('spammaster.basic_registration');
+  if ($signature_registration != 0) {
+    $form['spammaster_signature_registration'] = [
+      '#type' => 'item',
+      '#markup' => t("<a href='https://spammaster.techgasp.com' target='_blank'>Protected by Spam Master</a>"),
+      '#required' => FALSE,
+      '#weight' => 999,
+    ];
+  }
+  // Check for spam in user registration form.
+  // Check ip and email via local db and api.
+  $user_forms = ['user_register_form'];
+
+  if (in_array($form_id, $user_forms)) {
+    // Add a new validation handler to the form if setting is active.
+    if ($basic_registration != 0) {
+      $form['#validate'][] = 'spammaster_registration_validate';
+    }
+  }
+}
+
+/**
+ * Implements validate().
+ */
+function spammaster_registration_validate(&$form, &$form_state) {
+
+  $spammasterip = \Drupal::request()->getClientIp();
+  $spammasteremail = $form_state->getValue('mail');
+  $formstate = $form_state;
+  // RegistrationController Call.
+  $spammaster_registration_controller = new SpamMasterRegistrationController();
+  $spammaster_registration_check = $spammaster_registration_controller->spammasterregistrationcheck($form, $formstate, $spammasterip, $spammasteremail);
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function spammaster_form_contact_message_form_alter(&$form, &$form_state, $form_id) {
+
+  $spammaster_settings = \Drupal::config('spammaster.settings');
+  $signature_contact = $spammaster_settings->get('spammaster.signature_contact');
+  $basic_contact = $spammaster_settings->get('spammaster.basic_contact');
+  if ($signature_contact != 0) {
+    $form['spammaster_signature_contact'] = [
+      '#type' => 'item',
+      '#markup' => t("<a href='https://spammaster.techgasp.com' target='_blank'>Protected by Spam Master</a>"),
+      '#required' => FALSE,
+      '#weight' => 999,
+    ];
+  }
+  // Check for spam in contact form.
+  // Check ip and email via local db and api.
+  $user_forms = [$form_id];
+
+  if (in_array($form_id, $user_forms)) {
+    $spammaster_anonymous = \Drupal::currentUser()->isAnonymous();
+    // Add a new validation handler to the form if setting is active.
+    if ($basic_contact != 0 && $spammaster_anonymous) {
+      $form['#validate'][] = 'spammaster_contact_validate';
+    }
+  }
+}
+
+/**
+ * Implements validate().
+ */
+function spammaster_contact_validate(&$form, &$form_state) {
+
+  $spammasterip = \Drupal::request()->getClientIp();
+  $spammasteremail = $form_state->getValue('mail');
+  $formstate = $form_state;
+  $spammastermessage = $form_state->getValue('message')[0]['value'];
+  // ContactController Call.
+  $spammaster_contact_controller = new SpamMasterContactController();
+  $spammaster_contact_check = $spammaster_contact_controller->spammastercontactcheck($form, $formstate, $spammasterip, $spammasteremail, $spammastermessage);
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function spammaster_form_comment_form_alter(&$form, &$form_state, $form_id) {
+  $spammaster_settings = \Drupal::config('spammaster.settings');
+  $signature_comment = $spammaster_settings->get('spammaster.signature_comment');
+  $basic_comment = $spammaster_settings->get('spammaster.basic_comment');
+  if ($signature_comment != 0) {
+    $form['spammaster_signature_comment'] = [
+      '#type' => 'item',
+      '#markup' => t("<a href='https://spammaster.techgasp.com' target='_blank'>Protected by Spam Master</a>"),
+      '#required' => FALSE,
+      '#weight' => 999,
+    ];
+  }
+  // Check for spam in comment form.
+  // Check ip and email via local db and api.
+  $user_forms = [$form_id];
+
+  if (in_array($form_id, $user_forms)) {
+    $spammaster_anonymous = \Drupal::currentUser()->isAnonymous();
+    // Add a new validation handler to the form if setting is active.
+    if ($basic_comment != 0 && $spammaster_anonymous) {
+      $form['#validate'][] = 'spammaster_comment_validate';
+    }
+  }
+}
+
+/**
+ * Implements validate().
+ */
+function spammaster_comment_validate(&$form, &$form_state) {
+
+  $spammasterip = \Drupal::request()->getClientIp();
+  $spammasteremail = $form_state->getValue('mail');
+  $formstate = $form_state;
+  if (!empty($spammasteremail)) {
+    $spammasteremail = 'drup@' . date('Ymdhis') . '.drup';
+  }
+  $spammastercomment = $form_state->getValue('comment_body')[0]['value'];
+  // CommentController Call.
+  $spammaster_comment_controller = new SpamMasterCommentController();
+  $spammaster_comment_check = $spammaster_comment_controller->spammastercommentcheck($form, $formstate, $spammasterip, $spammasteremail, $spammastercomment);
+}
