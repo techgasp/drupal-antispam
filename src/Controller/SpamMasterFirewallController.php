@@ -12,7 +12,7 @@ class SpamMasterFirewallController extends ControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function content() {
+  public function spammasterfirewall() {
 
     return [
       '#theme' => 'firewall',

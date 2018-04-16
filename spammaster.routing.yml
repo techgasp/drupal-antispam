@@ -47,10 +47,17 @@ spammaster.spammastercontactcheck:
     _title: 'Spam Master Contact Controller'
   requirements:
     _permission: 'access content'
-spammaster.content:
+spammaster.spammasterfirewall:
   path: '/firewall'
   defaults:
-    _controller: '\Drupal\spammaster\Controller\SpamMasterFirewallController::content'
+    _controller: '\Drupal\spammaster\Controller\SpamMasterFirewallController::spammasterfirewall'
     _title: 'Spam Master Firewall'
+  requirements:
+    _permission: 'access content'
+spammaster.spammasterstatistics:
+  path: '/statistics'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterStatisticsController::spammasterstatistics'
+    _title: 'Spam Master Statistics'
   requirements:
     _permission: 'access content'

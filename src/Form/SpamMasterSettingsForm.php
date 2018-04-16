@@ -5,6 +5,7 @@ namespace Drupal\spammaster\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\spammaster\Controller\SpamMasterLicController;
+use Drupal\Core\Url;
 
 /**
  * Class controller.
@@ -21,13 +22,43 @@ class SpamMasterSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  public function spammasterstatisticspage($form, &$form_state) {
+    $spam_get_statistics = $form_state->getValue('statistics_header')['buttons']['addrow']['statistics'];
+    if (!empty($spam_get_statistics)) {
+      $spammaster_build_statistics_url = 'http://' . $_SERVER['SERVER_NAME'] . '/statistics';
+      $spammaster_statistics_url = Url::fromUri($spammaster_build_statistics_url);
+      $form_state->setRedirectUrl($spammaster_statistics_url);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function spammasterfirewallpage($form, &$form_state) {
+    $spam_get_firewall = $form_state->getValue('statistics_header')['buttons']['addrow']['firewall'];
+    if (!empty($spam_get_firewall)) {
+      $spammaster_build_firewall_url = 'http://' . $_SERVER['SERVER_NAME'] . '/firewall';
+      $spammaster_firewall_url = Url::fromUri($spammaster_build_firewall_url);
+      $form_state->setRedirectUrl($spammaster_firewall_url);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function spammasterdeletethreat($form, &$form_state) {
     $spam_form_delete = $form_state->getValue('buffer_header')['table'];
+    $spammaster_buffer_date = date("Y-m-d H:i:s");
     foreach ($spam_form_delete as $spam_row_delete) {
       if (!empty($spam_row_delete)) {
         db_query('DELETE FROM {spammaster_threats} WHERE id = :row', [':row' => $spam_row_delete]);
         drupal_set_message(t('Saved Spam Buffer deletion.'));
         \Drupal::logger('spammaster-buffer')->notice('Spam Master: buffer deletion, Id: ' . $spam_row_delete);
+        $spammaster_db_buffer_delete = db_insert('spammaster_keys')->fields([
+          'date' => $spammaster_buffer_date,
+          'spamkey' => 'spammaster-buffer',
+          'spamvalue' => 'Spam Master: buffer deletion, Id: ' . $spam_row_delete,
+        ])->execute();
       }
     }
   }
@@ -35,7 +66,42 @@ class SpamMasterSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  public function spammasterdeletekey($form, &$form_state) {
+    $spam_form_key_delete = $form_state->getValue('statistics_header')['table'];
+    $spammaster_key_date = date("Y-m-d H:i:s");
+    foreach ($spam_form_key_delete as $spam_key_delete) {
+      if (!empty($spam_key_delete)) {
+        db_query('DELETE FROM {spammaster_keys} WHERE id = :row', [':row' => $spam_key_delete]);
+        drupal_set_message(t('Saved Spam Master Log deletion.'));
+        \Drupal::logger('spammaster-log')->notice('Spam Master: log deletion, Id: ' . $spam_key_delete);
+        $spammaster_db_key_delete = db_insert('spammaster_keys')->fields([
+          'date' => $spammaster_key_date,
+          'spamkey' => 'spammaster-log',
+          'spamvalue' => 'Spam Master: log deletion, Id: ' . $spam_key_delete,
+        ])->execute();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function spammasterdeletekeysall() {
+    \Drupal::configFactory()->getEditable('spammaster.settings')
+      ->set('spammaster.total_block_count', '0')
+      ->save();
+    $spammaster_db_keys_truncate = db_truncate('spammaster_keys')->execute();
+    drupal_set_message(t('Saved Spam Master Statistics & Logs full deletion.'));
+    \Drupal::logger('spammaster-log')->notice('Spam Master: Statistics & Logs full deletion.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
+
+    // Form constructor.
+    $form = parent::buildForm($form, $form_state);
 
     // Default settings.
     $config = $this->config('spammaster.settings');
@@ -114,12 +180,7 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       $spammaster_alert_level_p_label = " % percent probability";
     }
 
-    // Form constructor.
-    $form = parent::buildForm($form, $form_state);
-    // Default settings.
-    $config = $this->config('spammaster.settings');
-
-    // Start TREE->1 license and status.
+    // Start TREE-> 1 license and status.
     $form['license_header'] = [
       '#type' => 'details',
       '#title' => $this->t('<h3>License & Status</h3>'),
@@ -194,7 +255,7 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       '#description' => t('Your spam probability. <a href="@spammaster_url">About Spam Probability</a>.', ['@spammaster_url' => 'https://spammaster.techgasp.com/documentation/']),
     ];
 
-    // Start TREE->2 protection tools.
+    // Start TREE-> 2 protection tools.
     $form['protection_header'] = [
       '#type' => 'details',
       '#title' => $this->t('<h3>Protection Tools</h3>'),
@@ -214,7 +275,7 @@ class SpamMasterSettingsForm extends ConfigFormBase {
     $form['protection_header']['basic'] = [
       '#type' => 'table',
       '#header' => [
-          ['data' => 'Activate individual Basic Tools to implement Spam Master accross your site.', 'colspan' => 4],
+          ['data' => 'Activate individual Basic Tools to implement Spam Master across your site.', 'colspan' => 4],
       ],
     ];
     $form['protection_header']['basic']['addrow']['basic_firewall'] = [
@@ -224,7 +285,7 @@ class SpamMasterSettingsForm extends ConfigFormBase {
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.basic_firewall'),
-      '#description' => t('Set this to <em>Yes</em> if you would like the Firewall scan implemented across you site. Greatly reduces server resources like CPU and Memory.'),
+      '#description' => t('Set this to <em>Yes</em> if you would like the Firewall scan implemented across your site. Greatly reduces server resources like CPU and Memory.'),
     ];
     $form['protection_header']['basic']['addrow']['basic_registration'] = [
       '#type' => 'select',
@@ -255,6 +316,131 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       ],
       '#default_value' => $config->get('spammaster.basic_contact'),
       '#description' => t('Set this to <em>Yes</em> if you would like the Contact Scanto be display on the contact form.'),
+    ];
+
+    // Insert Extra tools table inside tree.
+    $form['protection_header']['extra'] = [
+      '#type' => 'table',
+      '#header' => [
+          ['data' => 'Activate individual Extra Tools to implement Spam Master across your site.', 'colspan' => 4],
+      ],
+    ];
+
+    $form['protection_header']['extra']['addrow']['extra_honeypot'] = [
+      '#type' => 'select',
+      '#title' => t('Honeypot'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_honeypot'),
+      '#description' => t('Set this to <em>Yes</em> if you would like 2 Honeypot fields implemented across your site forms.'),
+    ];
+    $form['protection_header']['extra']['addrow']['extra_recaptcha'] = [
+      '#type' => 'select',
+      '#title' => t('Google re-Captcha V2'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_recaptcha'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Google re-Captcha V2 implemented across your site forms.'),
+    ];
+    // Insert addrow re-captcha api key.
+    $form['protection_header']['extra']['addrow']['extra_recaptcha_api_key'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Google re-Captcha API Site Key:'),
+      '#default_value' => $config->get('spammaster.extra_recaptcha_api_key'),
+      '#description' => $this->t('Insert your Google re-Captcha api key.'),
+    ];
+    // Insert addrow re-captcha secrete key.
+    $form['protection_header']['extra']['addrow']['extra_recaptcha_api_secret_key'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Google re-Captcha API Secret Key:'),
+      '#default_value' => $config->get('spammaster.extra_recaptcha_api_secret_key'),
+      '#description' => $this->t('Insert your Google re-Captcha api secret key.'),
+    ];
+
+    $form['protection_header']['extra']['addrow1']['extra_recaptcha_login'] = [
+      '#type' => 'select',
+      '#title' => t('re-Captcha on Login Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_recaptcha_login'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Google re-Captcha implemented on the Login Form.'),
+    ];
+    $form['protection_header']['extra']['addrow1']['extra_recaptcha_registration'] = [
+      '#type' => 'select',
+      '#title' => t('re-Captcha on Registration Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_recaptcha_registration'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Google re-Captcha implemented on the Registration Form.'),
+    ];
+    $form['protection_header']['extra']['addrow1']['extra_recaptcha_comment'] = [
+      '#type' => 'select',
+      '#title' => t('re-Captcha on Comment Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_recaptcha_comment'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Google re-Captcha implemented on the Comment Form.'),
+    ];
+    $form['protection_header']['extra']['addrow1']['extra_recaptcha_contact'] = [
+      '#type' => 'select',
+      '#title' => t('re-Captcha on Contact Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_recaptcha_contact'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Google re-Captcha implemented on the Contact Form.'),
+    ];
+
+    $form['protection_header']['extra']['addrow2']['extra_honeypot_login'] = [
+      '#type' => 'select',
+      '#title' => t('honeypot on Login Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_honeypot_login'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Honeypot on the Login Form.'),
+    ];
+    $form['protection_header']['extra']['addrow2']['extra_honeypot_registration'] = [
+      '#type' => 'select',
+      '#title' => t('honeypot on Registration Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_honeypot_registration'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Honeypot on the Registration Form.'),
+    ];
+    $form['protection_header']['extra']['addrow2']['extra_honeypot_comment'] = [
+      '#type' => 'select',
+      '#title' => t('honeypot on Comment Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_honeypot_comment'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Honeypot on the Comment Form.'),
+    ];
+    $form['protection_header']['extra']['addrow2']['extra_honeypot_contact'] = [
+      '#type' => 'select',
+      '#title' => t('honeypot on Contact Form'),
+      '#options' => [
+        0 => t('No'),
+        1 => t('Yes'),
+      ],
+      '#default_value' => $config->get('spammaster.extra_honeypot_contact'),
+      '#description' => t('Set this to <em>Yes</em> if you would like Honeypot on the Contact Form.'),
     ];
 
     // Insert signature tools table inside tree.
@@ -353,7 +539,7 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       '#description' => t('Set this to <em>Yes</em> to help Us improve Spam Master with weekly statistical data, same as your weekly report.'),
     ];
 
-    // Start TREE->3 Buffer.
+    // Start TREE-> 3 Buffer.
     $form['buffer_header'] = [
       '#type' => 'details',
       '#title' => $this->t('<h3>Spam Buffer</h3>'),
@@ -366,22 +552,32 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       'id' => t('ID'),
       'date' => t('Date'),
       'threat' => t('Threat'),
+      'search' => t('Search'),
     ];
     // Get table spammaster_threats data.
     $query = \Drupal::database()->select('spammaster_threats', 'u');
     $query->fields('u', ['id', 'date', 'threat']);
     // Pagination, we need to extend pagerselectextender and limit the query.
     $query->orderBy('id', 'DESC');
-    $pager = $query->extend('Drupal\Core\Database\Query\PagerSelectExtender')->limit(25);
+    $pager = $query->extend('Drupal\Core\Database\Query\PagerSelectExtender')->limit(20);
     $spammaster_spam_buffer = $pager->execute()->fetchAll();
 
     $output = [];
     foreach ($spammaster_spam_buffer as $results) {
       if (!empty($results)) {
+        if (filter_var($results->threat, FILTER_VALIDATE_IP)) {
+          $search = Url::fromUri('https://spammaster.techgasp.com/search-threat/?search_spam_threat=' . $results->threat);
+          $search_display = \Drupal::l('+ Spam Master online database', $search);
+        }
+        else {
+          $search_display = 'discard email';
+          $search = '';
+        }
         $output[$results->id] = [
           'id' => $results->id,
           'date' => $results->date,
           'threat' => $results->threat,
+          'search' => $search_display,
         ];
       }
     }
@@ -411,17 +607,44 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       '#type' => 'pager',
     ];
 
-    // Start TREE->4 statistics.
+    // Start TREE-> 4 statistics.
     $form['statistics_header'] = [
       '#type' => 'details',
-      '#title' => $this->t('<h3>Statistics</h3>'),
+      '#title' => $this->t('<h3>Statistics & Log</h3>'),
       '#tree' => TRUE,
       '#open' => FALSE,
     ];
+    // Create buttons table.
+    $form['statistics_header']['buttons'] = [
+      '#type' => 'table',
+      '#header' => [],
+    ];
+    // Insert addrow statistics button.
+    $form['statistics_header']['buttons']['addrow']['statistics'] = [
+      '#type' => 'submit',
+      '#attributes' => [
+        'class' => ['button button--primary'],
+      ],
+      '#value' => t('Visit your Statistics Page'),
+      '#submit' => ['::spammasterstatisticspage'],
+    ];
+    // Insert addrow firewall button.
+    $form['statistics_header']['buttons']['addrow']['firewall'] = [
+      '#type' => 'submit',
+      '#attributes' => [
+        'class' => ['button button--primary'],
+      ],
+      '#value' => t('Visit your Firewall Page'),
+      '#submit' => ['::spammasterfirewallpage'],
+    ];
 
+    $spammaster_total_block_count = $config->get('spammaster.total_block_count');
+    if (empty($spammaster_total_block_count)) {
+      $spammaster_total_block_count = '0';
+    }
     // Insert statistics table inside tree.
     $form['statistics_header']['total_block_count'] = [
-      '#markup' => '<p>Total Blocks: <b>' . $config->get('spammaster.total_block_count') . '</b></p>',
+      '#markup' => '<h2>Total Blocks: <b>' . $spammaster_total_block_count . '</b></h2>',
     ];
 
     $form['statistics_header']['statistics'] = [
@@ -563,9 +786,60 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       <p>Total Blocks: <b>' . $spammaster_contact_result . '</b></p>',
     ];
 
-    // Insert statistics footer inside tree.
-    $form['statistics_header']['description'] = [
-      '#markup' => '<p>All activity is being logged, you can check logs via top menu -> Reports -> Recent Log Messages, you can filter data by selectin the type "spammaster-*.</p>',
+    // Construct header.
+    $header_key = [
+      'id' => t('ID'),
+      'date' => t('Date'),
+      'spamkey' => t('Type'),
+      'spamvalue' => t('Description'),
+    ];
+    // Get table spammaster_keys data.
+    $query_db = \Drupal::database()->select('spammaster_keys', 'u');
+    $query_db->fields('u', ['id', 'date', 'spamkey', 'spamvalue']);
+    // Pagination, we need to extend pagerselectextender and limit the query.
+    $query_db->orderBy('id', 'DESC');
+    $pager_db = $query_db->extend('Drupal\Core\Database\Query\PagerSelectExtender')->limit(20);
+    $spammaster_spam_key = $pager_db->execute()->fetchAll();
+
+    $output_key = [];
+    foreach ($spammaster_spam_key as $results_key) {
+      if (!empty($results_key)) {
+        $output_key[$results_key->id] = [
+          'id' => $results_key->id,
+          'date' => $results_key->date,
+          'spamkey' => $results_key->spamkey,
+          'spamvalue' => $results_key->spamvalue,
+        ];
+      }
+    }
+    // Display table.
+    $form['statistics_header']['table'] = [
+      '#type' => 'tableselect',
+      '#header' => $header_key,
+      '#options' => $output_key,
+      '#empty' => t('No log found'),
+    ];
+    // Delete button at end of table, calls spammasterdeletekey function.
+    $form['statistics_header']['submit'] = [
+      '#type' => 'submit',
+      '#attributes' => [
+        'class' => ['button button--primary'],
+      ],
+      '#value' => t('Delete Log Entry'),
+      '#submit' => ['::spammasterdeletekey'],
+    ];
+    // Delete button at end of table, calls spammasterdeletekeysall function.
+    $form['statistics_header']['submit_all'] = [
+      '#type' => 'submit',
+      '#attributes' => [
+        'class' => ['button button--primary'],
+      ],
+      '#value' => t('Delete all Statistics & Logs -> Caution, no way back'),
+      '#submit' => ['::spammasterdeletekeysall'],
+    ];
+    // Form pager if ore than 25 entries.
+    $form['statistics_header']['pager_db'] = [
+      '#type' => 'pager',
     ];
 
     return $form;
@@ -593,6 +867,18 @@ class SpamMasterSettingsForm extends ConfigFormBase {
     $config->set('spammaster.basic_registration', $form_state->getValue('protection_header')['basic']['addrow']['basic_registration']);
     $config->set('spammaster.basic_comment', $form_state->getValue('protection_header')['basic']['addrow']['basic_comment']);
     $config->set('spammaster.basic_contact', $form_state->getValue('protection_header')['basic']['addrow']['basic_contact']);
+    $config->set('spammaster.extra_honeypot', $form_state->getValue('protection_header')['extra']['addrow']['extra_honeypot']);
+    $config->set('spammaster.extra_recaptcha', $form_state->getValue('protection_header')['extra']['addrow']['extra_recaptcha']);
+    $config->set('spammaster.extra_recaptcha_api_key', $form_state->getValue('protection_header')['extra']['addrow']['extra_recaptcha_api_key']);
+    $config->set('spammaster.extra_recaptcha_api_secret_key', $form_state->getValue('protection_header')['extra']['addrow']['extra_recaptcha_api_secret_key']);
+    $config->set('spammaster.extra_recaptcha_login', $form_state->getValue('protection_header')['extra']['addrow1']['extra_recaptcha_login']);
+    $config->set('spammaster.extra_recaptcha_registration', $form_state->getValue('protection_header')['extra']['addrow1']['extra_recaptcha_registration']);
+    $config->set('spammaster.extra_recaptcha_comment', $form_state->getValue('protection_header')['extra']['addrow1']['extra_recaptcha_comment']);
+    $config->set('spammaster.extra_recaptcha_contact', $form_state->getValue('protection_header')['extra']['addrow1']['extra_recaptcha_contact']);
+    $config->set('spammaster.extra_honeypot_login', $form_state->getValue('protection_header')['extra']['addrow2']['extra_honeypot_login']);
+    $config->set('spammaster.extra_honeypot_registration', $form_state->getValue('protection_header')['extra']['addrow2']['extra_honeypot_registration']);
+    $config->set('spammaster.extra_honeypot_comment', $form_state->getValue('protection_header')['extra']['addrow2']['extra_honeypot_comment']);
+    $config->set('spammaster.extra_honeypot_contact', $form_state->getValue('protection_header')['extra']['addrow2']['extra_honeypot_contact']);
     $config->set('spammaster.signature_registration', $form_state->getValue('protection_header')['signature']['addrow']['signature_registration']);
     $config->set('spammaster.signature_login', $form_state->getValue('protection_header')['signature']['addrow']['signature_login']);
     $config->set('spammaster.signature_comment', $form_state->getValue('protection_header')['signature']['addrow']['signature_comment']);

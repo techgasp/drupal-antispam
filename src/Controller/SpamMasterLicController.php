@@ -34,7 +34,7 @@ class SpamMasterLicController extends ControllerBase {
     $spammaster_site_url = \Drupal::request()->getHost();
     $spammaster_admin = $user_settings->get('name')->value;
     $spammaster_admin_email = $site_settings->get('mail');
-    $spammaster_ip = \Drupal::request()->getClientIp();
+    $spammaster_ip = $_SERVER['SERVER_ADDR'];
     // If empty ip.
     if (empty($spammaster_ip) || $spammaster_ip == '0') {
       @$spammaster_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);
@@ -140,7 +140,7 @@ class SpamMasterLicController extends ControllerBase {
       $spammaster_site_url = \Drupal::request()->getHost();
       $spammaster_admin = $user_settings->get('name')->value;
       $spammaster_admin_email = $site_settings->get('mail');
-      $spammaster_ip = \Drupal::request()->getClientIp();
+      $spammaster_ip = $_SERVER['SERVER_ADDR'];
       // If empty ip.
       if (empty($spammaster_ip) || $spammaster_ip == '0') {
         @$spammaster_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);

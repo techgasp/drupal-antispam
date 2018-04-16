@@ -11,6 +11,18 @@ spammaster:
   basic_registration: '1'
   basic_comment: '1'
   basic_contact: '1'
+  extra_recaptcha: '0'
+  extra_recaptcha_api_key:
+  extra_recaptcha_api_secret_key:
+  extra_recaptcha_login: '0'
+  extra_recaptcha_registration: '0'
+  extra_recaptcha_comment: '0'
+  extra_recaptcha_contact: '0'
+  extra_honeypot: '0'
+  extra_honeypot_login: '0'
+  extra_honeypot_registration: '0'
+  extra_honeypot_comment: '0'
+  extra_honeypot_contact: '0'
   signature_registration: '1'
   signature_login: '1'
   signature_comment: '1'

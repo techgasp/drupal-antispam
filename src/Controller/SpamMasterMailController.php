@@ -343,7 +343,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $spam_master_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count) . ' firewall triggers & registrations blocked';
     }
     $spammaster_license_alert_level = $spammaster_settings->get('spammaster.license_alert_level');
-    // Get count last 7 days of blocks from whatchdog.
+    // Get count last 7 days of blocks from spammaster_keys.
     $time = date('Y-m-d H:i:s');
     $time_expires = date('Y-m-d H:i:s', strtotime($time . '-1 days'));
     $spammaster_spam_watch_query = \Drupal::database()->select('spammaster_keys', 'u');
@@ -490,7 +490,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $spam_master_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count) . ' firewall triggers & registrations blocked';
     }
     $spammaster_license_alert_level = $spammaster_settings->get('spammaster.license_alert_level');
-    // Get count last 7 days of blocks from whatchdog.
+    // Get count last 7 days of blocks from spammaster_keys.
     $time = date('Y-m-d H:i:s');
     $time_expires = date('Y-m-d H:i:s', strtotime($time . '-1 days'));
     $spammaster_spam_watch_query = \Drupal::database()->select('spammaster_keys', 'u');
@@ -569,7 +569,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= 'Spam Buffer Size: ' . number_format($spammaster_buffer_size_result_count);
     $spam_master_table_content .= "\r\n";
-    $spam_master_table_content .= 'Spam Master Statistics powered by TechGasp.';
+    $spam_master_table_content .= 'Spam Master Statistics powered by TechGasp Drupal.';
     $spam_master_table_content .= "\r\n";
     $mailManager = \Drupal::service('plugin.manager.mail');
     $module = 'spammaster';

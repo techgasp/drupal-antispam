@@ -10,11 +10,13 @@ use Drupal\spammaster\Controller\SpamMasterCronController;
 use Drupal\spammaster\Controller\SpamMasterRegistrationController;
 use Drupal\spammaster\Controller\SpamMasterCommentController;
 use Drupal\spammaster\Controller\SpamMasterContactController;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
  */
 function spammaster_help($process_name, RouteMatchInterface $route_match) {
+
   switch ($process_name) {
     case 'help.page.spammaster':
       $output_help = '<h3>' . t('About') . '</h3>';
@@ -31,6 +33,7 @@ function spammaster_help($process_name, RouteMatchInterface $route_match) {
       $output_help .= '<p>' . t('Future versions may include several types of API enhacements.') . '</p>';
       return $output_help;
   }
+
 }
 
 /**
@@ -62,6 +65,7 @@ function spammaster_cron() {
     // Watchdog log.
     \Drupal::logger('spammaster')->notice('Spam Master: weekly cron run successfully');
   }
+
 }
 
 /**
@@ -73,7 +77,105 @@ function spammaster_theme($existing, $type, $theme, $path) {
     'firewall' => [
       'variables' => [],
     ],
+    'statistics' => [
+      'variables' => [
+        'spam_master_today_minus_1' => NULL,
+        'spam_master_today_minus_2' => NULL,
+        'spam_master_today_minus_3' => NULL,
+        'spam_master_today_minus_4' => NULL,
+        'spam_master_today_minus_5' => NULL,
+        'totalitems_firewall_blocked_1' => NULL,
+        'totalitems_firewall_blocked_2' => NULL,
+        'totalitems_firewall_blocked_3' => NULL,
+        'totalitems_firewall_blocked_4' => NULL,
+        'totalitems_firewall_blocked_5' => NULL,
+        'totalitems_registration_blocked_1' => NULL,
+        'totalitems_registration_blocked_2' => NULL,
+        'totalitems_registration_blocked_3' => NULL,
+        'totalitems_registration_blocked_4' => NULL,
+        'totalitems_registration_blocked_5' => NULL,
+        'totalitems_comment_blocked_1' => NULL,
+        'totalitems_comment_blocked_2' => NULL,
+        'totalitems_comment_blocked_3' => NULL,
+        'totalitems_comment_blocked_4' => NULL,
+        'totalitems_comment_blocked_5' => NULL,
+        'totalitems_contact_blocked_1' => NULL,
+        'totalitems_contact_blocked_2' => NULL,
+        'totalitems_contact_blocked_3' => NULL,
+        'totalitems_contact_blocked_4' => NULL,
+        'totalitems_contact_blocked_5' => NULL,
+        'total_count' => NULL,
+        'total_count_firewall' => NULL,
+        'total_count_registration' => NULL,
+        'total_count_comment' => NULL,
+        'total_count_contact' => NULL,
+        'spam_master_month_minus_1' => NULL,
+        'spam_master_month_minus_2' => NULL,
+        'spam_master_month_minus_3' => NULL,
+        'total_month_firewall_1' => NULL,
+        'total_month_firewall_2' => NULL,
+        'total_month_firewall_3' => NULL,
+        'total_month_registration_1' => NULL,
+        'total_month_registration_2' => NULL,
+        'total_month_registration_3' => NULL,
+        'total_month_comment_1' => NULL,
+        'total_month_comment_2' => NULL,
+        'total_month_comment_3' => NULL,
+        'total_month_contact_1' => NULL,
+        'total_month_contact_2' => NULL,
+        'total_month_contact_3' => NULL,
+      ],
+    ],
+    'total_count' => [
+      'variables' => [
+        'spammaster_total_threats_count' => NULL,
+        'spammaster_total_threats_footer' => NULL,
+      ],
+    ],
+    'heads_up' => [
+      'variables' => [
+        'spammaster_table_head' => NULL,
+        'image_check' => NULL,
+        'image_pass' => NULL,
+        'image_lock' => NULL,
+        'image_inactive' => NULL,
+        'protection_engine_version_text' => NULL,
+        'protection_engine_version' => NULL,
+        'protection_license_protection_text' => NULL,
+        'protection_license_protection' => NULL,
+        'protection_license_protection_end' => NULL,
+        'protection_scan_text' => NULL,
+        'protection_firewall_text' => NULL,
+        'spam_ssl_image' => NULL,
+        'spam_ssl_text' => NULL,
+        'spammaster_table_footer' => NULL,
+      ],
+    ],
+    'firewall_status' => [
+      'variables' => [
+        'spammaster_table_head' => NULL,
+        'image_path' => NULL,
+        'output_d1' => NULL,
+        'output_t2' => NULL,
+        'output_d3' => NULL,
+        'output_t4' => NULL,
+        'output_d5' => NULL,
+        'output_t6' => NULL,
+        'output_d7' => NULL,
+        'output_t8' => NULL,
+        'output_d9' => NULL,
+        'output_t10' => NULL,
+        'output_d11' => NULL,
+        'output_t12' => NULL,
+        'output_d13' => NULL,
+        'output_t14' => NULL,
+        'output_d15' => NULL,
+        'output_t16' => NULL,
+        'spammaster_table_footer' => NULL,
+      ],
+    ],
   ];
+
 }
 
 /**
@@ -84,6 +186,7 @@ function spammaster_mail($key, &$message, $params) {
   $options = [
     'langcode' => $message['langcode'],
   ];
+
   switch ($key) {
     case 'license_trial_create':
       $spammaster_subject_title = 'Congratulations!!!';
@@ -142,13 +245,17 @@ function spammaster_mail($key, &$message, $params) {
       break;
 
   }
+
 }
 
 /**
  * Implements hook_form_alter().
  */
 function spammaster_form_user_login_form_alter(&$form, &$form_state, $form_id) {
+
   $spammaster_settings = \Drupal::config('spammaster.settings');
+  $login_extra_recaptcha = $spammaster_settings->get('spammaster.extra_recaptcha');
+  $login_extra_honeypot = $spammaster_settings->get('spammaster.extra_honeypot');
   $signature_login = $spammaster_settings->get('spammaster.signature_login');
   if ($signature_login != 0) {
     $form['spammaster_signature_login'] = [
@@ -158,16 +265,38 @@ function spammaster_form_user_login_form_alter(&$form, &$form_state, $form_id) {
       '#weight' => 999,
     ];
   }
+  // Implements reCaptcha form.
+  if ($login_extra_recaptcha != 0) {
+    $login_extra_recaptcha_field = $spammaster_settings->get('spammaster.extra_recaptcha_login');
+    if ($login_extra_recaptcha_field != 0) {
+      $form = spammaster_recaptcha_form($form, $form_state);
+      $form['#validate'][] = 'spammaster_recaptcha_validate';
+    }
+  }
+  // Implements Honeypot form.
+  if ($login_extra_honeypot != 0) {
+    $login_extra_honeypot_field = $spammaster_settings->get('spammaster.extra_honeypot_login');
+    if ($login_extra_honeypot_field != 0) {
+      $form = spammaster_honeypot_form($form, $form_state);
+      $form['#validate'][] = 'spammaster_honeypot_validate';
+    }
+  }
+
 }
 
 /**
  * Implements hook_form_alter().
  */
 function spammaster_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+
   $spammaster_settings = \Drupal::config('spammaster.settings');
-  $signature_registration = $spammaster_settings->get('spammaster.signature_registration');
+  $registration_extra_recaptcha = $spammaster_settings->get('spammaster.extra_recaptcha');
+  $registration_extra_honeypot = $spammaster_settings->get('spammaster.extra_honeypot');
+  $registration_signature = $spammaster_settings->get('spammaster.signature_registration');
   $basic_registration = $spammaster_settings->get('spammaster.basic_registration');
-  if ($signature_registration != 0) {
+
+  // Implements Signature form.
+  if ($registration_signature != 0) {
     $form['spammaster_signature_registration'] = [
       '#type' => 'item',
       '#markup' => t("<a href='https://spammaster.techgasp.com' target='_blank'>Protected by Spam Master</a>"),
@@ -180,11 +309,28 @@ function spammaster_form_user_register_form_alter(&$form, &$form_state, $form_id
   $user_forms = ['user_register_form'];
 
   if (in_array($form_id, $user_forms)) {
-    // Add a new validation handler to the form if setting is active.
+    // Add a new validation handler to the form if settings are active.
     if ($basic_registration != 0) {
       $form['#validate'][] = 'spammaster_registration_validate';
     }
+    // Implements reCaptcha form.
+    if ($registration_extra_recaptcha != 0) {
+      $registration_extra_recaptcha_field = $spammaster_settings->get('spammaster.extra_recaptcha_registration');
+      if ($registration_extra_recaptcha_field != 0) {
+        $form = spammaster_recaptcha_form($form, $form_state);
+        $form['#validate'][] = 'spammaster_recaptcha_validate';
+      }
+    }
+    // Implements Honeypot form.
+    if ($registration_extra_honeypot != 0) {
+      $registration_extra_honeypot_field = $spammaster_settings->get('spammaster.extra_honeypot_registration');
+      if ($registration_extra_honeypot_field != 0) {
+        $form = spammaster_honeypot_form($form, $form_state);
+        $form['#validate'][] = 'spammaster_honeypot_validate';
+      }
+    }
   }
+
 }
 
 /**
@@ -198,6 +344,7 @@ function spammaster_registration_validate(&$form, &$form_state) {
   // RegistrationController Call.
   $spammaster_registration_controller = new SpamMasterRegistrationController();
   $spammaster_registration_check = $spammaster_registration_controller->spammasterregistrationcheck($form, $formstate, $spammasterip, $spammasteremail);
+
 }
 
 /**
@@ -206,6 +353,8 @@ function spammaster_registration_validate(&$form, &$form_state) {
 function spammaster_form_contact_message_form_alter(&$form, &$form_state, $form_id) {
 
   $spammaster_settings = \Drupal::config('spammaster.settings');
+  $contact_extra_recaptcha = $spammaster_settings->get('spammaster.extra_recaptcha');
+  $contact_extra_honeypot = $spammaster_settings->get('spammaster.extra_honeypot');
   $signature_contact = $spammaster_settings->get('spammaster.signature_contact');
   $basic_contact = $spammaster_settings->get('spammaster.basic_contact');
   if ($signature_contact != 0) {
@@ -226,7 +375,24 @@ function spammaster_form_contact_message_form_alter(&$form, &$form_state, $form_
     if ($basic_contact != 0 && $spammaster_anonymous) {
       $form['#validate'][] = 'spammaster_contact_validate';
     }
+    // Implements reCaptcha form.
+    if ($contact_extra_recaptcha != 0) {
+      $contact_extra_recaptcha_field = $spammaster_settings->get('spammaster.extra_recaptcha_contact');
+      if ($contact_extra_recaptcha_field != 0) {
+        $form = spammaster_recaptcha_form($form, $form_state);
+        $form['#validate'][] = 'spammaster_recaptcha_validate';
+      }
+    }
+    // Implements Honeypot form.
+    if ($contact_extra_honeypot != 0) {
+      $contact_extra_honeypot_field = $spammaster_settings->get('spammaster.extra_honeypot_contact');
+      if ($contact_extra_honeypot_field != 0) {
+        $form = spammaster_honeypot_form($form, $form_state);
+        $form['#validate'][] = 'spammaster_honeypot_validate';
+      }
+    }
   }
+
 }
 
 /**
@@ -241,13 +407,17 @@ function spammaster_contact_validate(&$form, &$form_state) {
   // ContactController Call.
   $spammaster_contact_controller = new SpamMasterContactController();
   $spammaster_contact_check = $spammaster_contact_controller->spammastercontactcheck($form, $formstate, $spammasterip, $spammasteremail, $spammastermessage);
+
 }
 
 /**
  * Implements hook_form_alter().
  */
 function spammaster_form_comment_form_alter(&$form, &$form_state, $form_id) {
+
   $spammaster_settings = \Drupal::config('spammaster.settings');
+  $comment_extra_recaptcha = $spammaster_settings->get('spammaster.extra_recaptcha');
+  $comment_extra_honeypot = $spammaster_settings->get('spammaster.extra_honeypot');
   $signature_comment = $spammaster_settings->get('spammaster.signature_comment');
   $basic_comment = $spammaster_settings->get('spammaster.basic_comment');
   if ($signature_comment != 0) {
@@ -268,7 +438,24 @@ function spammaster_form_comment_form_alter(&$form, &$form_state, $form_id) {
     if ($basic_comment != 0 && $spammaster_anonymous) {
       $form['#validate'][] = 'spammaster_comment_validate';
     }
+    // Implements reCaptcha form.
+    if ($comment_extra_recaptcha != 0) {
+      $comment_extra_recaptcha_field = $spammaster_settings->get('spammaster.extra_recaptcha_comment');
+      if ($comment_extra_recaptcha_field != 0) {
+        $form = spammaster_recaptcha_form($form, $form_state);
+        $form['#validate'][] = 'spammaster_recaptcha_validate';
+      }
+    }
+    // Implements Honeypot form.
+    if ($comment_extra_honeypot != 0) {
+      $comment_extra_honeypot_field = $spammaster_settings->get('spammaster.extra_honeypot_comment');
+      if ($comment_extra_honeypot_field != 0) {
+        $form = spammaster_honeypot_form($form, $form_state);
+        $form['#validate'][] = 'spammaster_honeypot_validate';
+      }
+    }
   }
+
 }
 
 /**
@@ -286,4 +473,170 @@ function spammaster_comment_validate(&$form, &$form_state) {
   // CommentController Call.
   $spammaster_comment_controller = new SpamMasterCommentController();
   $spammaster_comment_check = $spammaster_comment_controller->spammastercommentcheck($form, $formstate, $spammasterip, $spammasteremail, $spammastercomment);
+
+}
+
+/**
+ * Implements form().
+ */
+function spammaster_recaptcha_form(&$form, &$form_state) {
+
+  $spammaster_settings = \Drupal::config('spammaster.settings');
+  $extra_recaptcha_api_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_key');
+
+  $form['spammaster_recaptcha_field'] = [
+    '#markup' => '<div class="g-recaptcha spammaster-recaptcha form-group" data-sitekey="' . $extra_recaptcha_api_key . '"></div>',
+    '#weight' => 99,
+    '#attached' => [
+      'html_head' => [
+        [
+          [
+            '#tag' => 'script',
+            '#attributes' => [
+              'src' => Url::fromUri('https://www.google.com/recaptcha/api.js', ['query' => ['hl' => \Drupal::service('language_manager')->getCurrentLanguage()->getId()], 'absolute' => TRUE])->toString(),
+              'async' => TRUE,
+              'defer' => TRUE,
+            ],
+          ],
+          'spammaster_recaptcha',
+        ],
+      ],
+    ],
+  ];
+
+  return $form;
+
+}
+
+/**
+ * Implements validate().
+ */
+function spammaster_recaptcha_validate(&$form, &$form_state) {
+
+  // Get Module Settings.
+  $spammaster_settings = \Drupal::config('spammaster.settings');
+  $spammaster_block_message = $spammaster_settings->get('spammaster.block_message');
+  $extra_recaptcha_api_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_key');
+  $extra_recaptcha_api_secret_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_secret_key');
+
+  $client = \Drupal::httpClient();
+  $response = $client->get('https://www.google.com/recaptcha/api/siteverify?secret=' . $extra_recaptcha_api_secret_key . '&response=' . $_POST['g-recaptcha-response']);
+  $response = json_decode($response->getBody(), TRUE);
+
+  if (empty($_POST['g-recaptcha-response'])) {
+    $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: Please verify the reCaptcha.');
+  }
+  if (empty($extra_recaptcha_api_key) || empty($extra_recaptcha_api_secret_key)) {
+    $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: No Google reCaptcha V2 API keys set. Please insert the Google reCaptcha API key and API secret key the in Spam Master Settings page.');
+  }
+  if (FALSE === $response['success']) {
+
+    $spammaster_ip = \Drupal::request()->getClientIp();
+    $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: Wrong reCaptcha verification. PLease try again.');
+
+    \Drupal::logger('spammaster-firewall')->notice('Spam Master: firewall reCaptcha block IP: ' . $spammaster_ip);
+
+    $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
+    $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
+    \Drupal::configFactory()->getEditable('spammaster.settings')
+      ->set('spammaster.total_block_count', $spammaster_total_block_count_1)
+      ->save();
+
+    $spammaster_date = date("Y-m-d H:i:s");
+    $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-firewall',
+      'spamvalue' => 'Spam Master: firewall reCaptcha block IP: ' . $spammaster_ip,
+    ])->execute();
+  }
+
+}
+
+/**
+ * Implements form().
+ */
+function spammaster_honeypot_form(&$form, &$form_state) {
+
+  $form['spammaster_extra_field_1'] = [
+    '#theme_wrappers' => [
+      'container' => [
+        '#id' => NULL,
+        '#attributes' => [
+          'class' => [
+            'spammaster_special_class',
+          ],
+          'style' => [
+            'display: none !important;',
+          ],
+        ],
+      ],
+    ],
+    '#type' => 'textfield',
+    '#required' => FALSE,
+    '#attributes' => [
+      'autocomplete' => 'off',
+    ],
+    '#weight' => 97,
+    '#title' => t('Insert your mother second name:'),
+    '#description' => t('Insert your mother second name.'),
+  ];
+  $form['spammaster_extra_field_2'] = [
+    '#theme_wrappers' => [
+      'container' => [
+        '#id' => NULL,
+        '#attributes' => [
+          'class' => [
+            'spammaster_special_class',
+          ],
+          'style' => [
+            'display: none !important;',
+          ],
+        ],
+      ],
+    ],
+    '#type' => 'textfield',
+    '#required' => FALSE,
+    '#attributes' => [
+      'autocomplete' => 'off',
+    ],
+    '#weight' => 98,
+    '#title' => t('Insert your father second name:'),
+    '#description' => t('Insert your father second name.'),
+  ];
+
+  return $form;
+
+}
+
+/**
+ * Implements validate().
+ */
+function spammaster_honeypot_validate(&$form, &$form_state) {
+
+  // Get Module Settings.
+  $spammaster_settings = \Drupal::config('spammaster.settings');
+  $spammaster_block_message = $spammaster_settings->get('spammaster.block_message');
+
+  $spammasterextrafield1 = $form_state->getValue('spammaster_extra_field_1');
+  $spammasterextrafield2 = $form_state->getValue('spammaster_extra_field_2');
+  if (!empty($spammasterextrafield1) || !empty($spammasterextrafield2)) {
+    $spammaster_ip = \Drupal::request()->getClientIp();
+    $form_state->setErrorByName('spammaster_extra_field_1', 'SPAM MASTER: ' . $spammaster_block_message);
+
+    \Drupal::logger('spammaster-firewall')->notice('Spam Master: firewall honeypot block IP: ' . $spammaster_ip);
+
+    $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
+    $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
+    \Drupal::configFactory()->getEditable('spammaster.settings')
+      ->set('spammaster.total_block_count', $spammaster_total_block_count_1)
+      ->save();
+
+    $spammaster_date = date("Y-m-d H:i:s");
+    $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-firewall',
+      'spamvalue' => 'Spam Master: firewall honeypot block IP: ' . $spammaster_ip,
+    ])->execute();
+  }
+
 }

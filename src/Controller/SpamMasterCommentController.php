@@ -94,7 +94,7 @@ class SpamMasterCommentController extends ControllerBase {
         $blog_web_address = \Drupal::request()->getHost();;
         $address_unclean = $blog_web_address;
         $address = preg_replace('#^https?://#', '', $address_unclean);
-        $blog_server_ip = \Drupal::request()->getClientIp();
+        $blog_server_ip = $_SERVER['SERVER_ADDR'];
         // If empty ip.
         if (empty($blog_server_ip) || $blog_server_ip == '0') {
           @$blog_server_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);

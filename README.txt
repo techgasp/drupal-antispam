@@ -2,7 +2,7 @@ INTRODUCTION
 --------
 
 Spam Master protection module for drupal blocks new user registrations, comments
- and threads using Real Time anti-spam lists as .
+ and threads using Real Time anti-spam lists as Saas.
 
 
 FEATURES

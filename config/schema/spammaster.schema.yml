@@ -41,6 +41,42 @@ spammaster.settings:
         basic_contact:
           type: select
           label: '1'
+        extra_recaptcha:
+          type: select
+          label: '0'
+        extra_recaptcha_api_key:
+          type: textfield
+          label: ''
+        extra_recaptcha_api_secret_key:
+          type: textfield
+          label: ''
+        extra_recaptcha_login:
+          type: select
+          label: '0'
+        extra_recaptcha_registration:
+          type: select
+          label: '0'
+        extra_recaptcha_comment:
+          type: select
+          label: '0'
+        extra_recaptcha_contact:
+          type: select
+          label: '0'
+        extra_honeypot:
+          type: select
+          label: '0'
+        extra_honeypot_login:
+          type: select
+          label: '0'
+        extra_honeypot_registration:
+          type: select
+          label: '0'
+        extra_honeypot_comment:
+          type: select
+          label: '0'
+        extra_honeypot_contact:
+          type: select
+          label: '0'
         signature_registration:
           type: select
           label: '1'

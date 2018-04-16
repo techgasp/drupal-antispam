@@ -1,0 +1,121 @@
+{% if user.hasPermission('administer nodes') %}
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Day', 'Firewall', 'Registration', 'Comments', 'Contact'],
+          ['{{ spam_master_today_minus_5 }}', {{ totalitems_firewall_blocked_5 }}, {{ totalitems_registration_blocked_5 }}, {{ totalitems_comment_blocked_5 }}, {{ totalitems_contact_blocked_5 }}],
+          ['{{ spam_master_today_minus_4 }}', {{ totalitems_firewall_blocked_4 }}, {{ totalitems_registration_blocked_4 }}, {{ totalitems_comment_blocked_5 }}, {{ totalitems_contact_blocked_5 }}],
+          ['{{ spam_master_today_minus_3 }}', {{ totalitems_firewall_blocked_3 }}, {{ totalitems_registration_blocked_3 }}, {{ totalitems_comment_blocked_5 }}, {{ totalitems_contact_blocked_5 }}],
+          ['{{ spam_master_today_minus_2 }}', {{ totalitems_firewall_blocked_2 }}, {{ totalitems_registration_blocked_2 }}, {{ totalitems_comment_blocked_5 }}, {{ totalitems_contact_blocked_5 }}],
+          ['{{ spam_master_today_minus_1 }}', {{ totalitems_firewall_blocked_1 }}, {{ totalitems_registration_blocked_1 }}, {{ totalitems_comment_blocked_5 }}, {{ totalitems_contact_blocked_5 }}],
+        ]);
+
+        var options = {
+          title: 'Last 5 days',
+          curveType: 'function',
+          legend: { position: 'right' },
+          series: {
+			0: { pointSize: '10'},
+			1: { pointSize: '10'},
+			2: { pointSize: '10'},
+			3: { pointSize: '10'},
+			4: { pointSize: '10'},
+		   },
+		   logscale: true,
+        };
+
+var chart = new google.visualization.LineChart(document.getElementById('5_days'));
+
+ chart.draw(data, options);
+}
+</script>
+
+<script type="text/javascript">
+google.charts.load('current', {packages: ['corechart', 'bar']});
+google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+        ['Totals', 'Total Count', { role: 'style' }, { role: 'annotation' }],
+        ['Total Blocks', {{ total_count }}, '#c2c0bf', {{ total_count }}],
+        ['Firewall', {{ total_count_firewall }}, '#3366cc', {{ total_count_firewall }}],
+        ['Registration', {{ total_count_registration }}, '#dc3912', {{ total_count_registration }}],
+        ['Comment', {{ total_count_comment }}, '#ff9900', {{ total_count_comment }}],
+        ['Contact', {{ total_count_contact }}, '#109618', {{ total_count_contact }}]
+      ]);
+
+      var options = {
+        title: "Total Count",
+        bar: {groupWidth: '95%'},
+        legend: { position: 'none' },
+        logscale: true,
+      };
+
+      var chart = new google.visualization.BarChart(document.getElementById('total_count'));
+      chart.draw(data, options);
+    }
+</script>
+
+<script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Month', 'Firewall', 'Registration', 'Comment', 'Contact'],
+          ['{{ spam_master_month_minus_3 }}', {{ total_month_firewall_3 }}, {{ total_month_registration_3 }}, {{ total_month_comment_3 }}, {{ total_month_contact_3 }}],
+          ['{{ spam_master_month_minus_2 }}', {{ total_month_firewall_2 }}, {{ total_month_registration_2 }}, {{ total_month_comment_2 }}, {{ total_month_contact_2 }}],
+          ['{{ spam_master_month_minus_1 }}', {{ total_month_firewall_1 }}, {{ total_month_registration_1 }}, {{ total_month_comment_1 }}, {{ total_month_contact_1 }}]
+        ]);
+
+        var options = {
+         title: "Last 3 Months",
+         bar: {groupWidth: '95%'},
+         legend: { position: 'bottom', maxLines: 3 },
+         logscale: true,
+         axes: {
+            x: {
+              0: { side: 'bottom', label: ''}
+            }
+          },
+
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('month_total'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+</script>
+
+
+<div id="total_count" style="width: 100%; height: 350px;"></div>
+
+<div class="spammaster_fw_footer">
+</div>
+
+<div id="month_total" style="width: 100%; height: 350px;"></div>
+
+<div class="spammaster_fw_footer">
+</div>
+
+<div id="5_days" style="width: 100%; height: 350px;"></div>
+
+<div class="spammaster_fw_footer">
+	<p>Powered by <a href="https://spammaster.techgasp.com">Spam Master</a></p>
+</div>
+
+{% else %}
+
+<p>Sorry, this page is restricted to administrators.</p>
+
+<div class="spammaster_fw_footer">
+	<p>Powered by <a href="https://spammaster.techgasp.com">Spam Master</a></p>
+</div>
+
+{% endif %}
