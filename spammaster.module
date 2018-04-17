@@ -53,6 +53,14 @@ function spammaster_cron() {
 
     // Watchdog log.
     \Drupal::logger('spammaster')->notice('Spam Master: daily cron run successfully');
+
+    // Spam Master log.
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster',
+      'spamvalue' => 'Spam Master: daily cron run successfully',
+    ])->execute();
   }
 
   // Implements weekly cron.
@@ -64,6 +72,14 @@ function spammaster_cron() {
 
     // Watchdog log.
     \Drupal::logger('spammaster')->notice('Spam Master: weekly cron run successfully');
+
+    // Spam Master log.
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster',
+      'spamvalue' => 'Spam Master: weekly cron run successfully',
+    ])->execute();
   }
 
 }
@@ -104,11 +120,23 @@ function spammaster_theme($existing, $type, $theme, $path) {
         'totalitems_contact_blocked_3' => NULL,
         'totalitems_contact_blocked_4' => NULL,
         'totalitems_contact_blocked_5' => NULL,
+        'totalitems_honeypot_blocked_1' => NULL,
+        'totalitems_honeypot_blocked_2' => NULL,
+        'totalitems_honeypot_blocked_3' => NULL,
+        'totalitems_honeypot_blocked_4' => NULL,
+        'totalitems_honeypot_blocked_5' => NULL,
+        'totalitems_recaptcha_blocked_1' => NULL,
+        'totalitems_recaptcha_blocked_2' => NULL,
+        'totalitems_recaptcha_blocked_3' => NULL,
+        'totalitems_recaptcha_blocked_4' => NULL,
+        'totalitems_recaptcha_blocked_5' => NULL,
         'total_count' => NULL,
         'total_count_firewall' => NULL,
         'total_count_registration' => NULL,
         'total_count_comment' => NULL,
         'total_count_contact' => NULL,
+        'total_count_honeypot' => NULL,
+        'total_count_recaptcha' => NULL,
         'spam_master_month_minus_1' => NULL,
         'spam_master_month_minus_2' => NULL,
         'spam_master_month_minus_3' => NULL,
@@ -124,6 +152,12 @@ function spammaster_theme($existing, $type, $theme, $path) {
         'total_month_contact_1' => NULL,
         'total_month_contact_2' => NULL,
         'total_month_contact_3' => NULL,
+        'total_month_honeypot_1' => NULL,
+        'total_month_honeypot_2' => NULL,
+        'total_month_honeypot_3' => NULL,
+        'total_month_recaptcha_1' => NULL,
+        'total_month_recaptcha_2' => NULL,
+        'total_month_recaptcha_3' => NULL,
       ],
     ],
     'total_count' => [
@@ -485,7 +519,7 @@ function spammaster_recaptcha_form(&$form, &$form_state) {
   $extra_recaptcha_api_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_key');
 
   $form['spammaster_recaptcha_field'] = [
-    '#markup' => '<div class="g-recaptcha spammaster-recaptcha form-group" data-sitekey="' . $extra_recaptcha_api_key . '"></div>',
+    '#markup' => '<div class="spammaster-recaptcha g-recaptcha form-group" data-sitekey="' . $extra_recaptcha_api_key . '"></div>',
     '#weight' => 99,
     '#attached' => [
       'html_head' => [
@@ -500,6 +534,9 @@ function spammaster_recaptcha_form(&$form, &$form_state) {
           ],
           'spammaster_recaptcha',
         ],
+      ],
+      'library' => [
+        'spammaster/spammaster-styles',
       ],
     ],
   ];
@@ -519,35 +556,37 @@ function spammaster_recaptcha_validate(&$form, &$form_state) {
   $extra_recaptcha_api_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_key');
   $extra_recaptcha_api_secret_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_secret_key');
 
-  $client = \Drupal::httpClient();
-  $response = $client->get('https://www.google.com/recaptcha/api/siteverify?secret=' . $extra_recaptcha_api_secret_key . '&response=' . $_POST['g-recaptcha-response']);
-  $response = json_decode($response->getBody(), TRUE);
+  if (isset($_POST['g-recaptcha-response'])){
+    $client = \Drupal::httpClient();
+    $response = $client->get('https://www.google.com/recaptcha/api/siteverify?secret=' . $extra_recaptcha_api_secret_key . '&response=' . $_POST['g-recaptcha-response']);
+    $response = json_decode($response->getBody(), TRUE);
 
-  if (empty($_POST['g-recaptcha-response'])) {
-    $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: Please verify the reCaptcha.');
-  }
-  if (empty($extra_recaptcha_api_key) || empty($extra_recaptcha_api_secret_key)) {
-    $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: No Google reCaptcha V2 API keys set. Please insert the Google reCaptcha API key and API secret key the in Spam Master Settings page.');
-  }
-  if (FALSE === $response['success']) {
+    if (empty($_POST['g-recaptcha-response'])) {
+      $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: Please verify the reCaptcha.');
+    }
+    if (empty($extra_recaptcha_api_key) || empty($extra_recaptcha_api_secret_key)) {
+      $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: No Google reCaptcha V2 API keys set. Please insert the Google reCaptcha API key and API secret key the in Spam Master Settings page.');
+    }
+    if (FALSE === $response['success']) {
 
-    $spammaster_ip = \Drupal::request()->getClientIp();
-    $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: Wrong reCaptcha verification. PLease try again.');
+      $spammaster_ip = \Drupal::request()->getClientIp();
+      $form_state->setErrorByName('spammaster_recaptcha_field', 'SPAM MASTER: Wrong reCaptcha verification. PLease try again.');
 
-    \Drupal::logger('spammaster-firewall')->notice('Spam Master: firewall reCaptcha block IP: ' . $spammaster_ip);
+      \Drupal::logger('spammaster-recaptcha')->notice('Spam Master: reCaptcha block IP: ' . $spammaster_ip);
 
-    $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
-    $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
-    \Drupal::configFactory()->getEditable('spammaster.settings')
-      ->set('spammaster.total_block_count', $spammaster_total_block_count_1)
-      ->save();
+      $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
+      $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
+      \Drupal::configFactory()->getEditable('spammaster.settings')
+        ->set('spammaster.total_block_count', $spammaster_total_block_count_1)
+        ->save();
 
-    $spammaster_date = date("Y-m-d H:i:s");
-    $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
-      'date' => $spammaster_date,
-      'spamkey' => 'spammaster-firewall',
-      'spamvalue' => 'Spam Master: firewall reCaptcha block IP: ' . $spammaster_ip,
-    ])->execute();
+      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_recaptcha_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-recaptcha',
+        'spamvalue' => 'Spam Master: reCaptcha block IP: ' . $spammaster_ip,
+      ])->execute();
+    }
   }
 
 }
@@ -623,7 +662,7 @@ function spammaster_honeypot_validate(&$form, &$form_state) {
     $spammaster_ip = \Drupal::request()->getClientIp();
     $form_state->setErrorByName('spammaster_extra_field_1', 'SPAM MASTER: ' . $spammaster_block_message);
 
-    \Drupal::logger('spammaster-firewall')->notice('Spam Master: firewall honeypot block IP: ' . $spammaster_ip);
+    \Drupal::logger('spammaster-honeypot')->notice('Spam Master: honeypot block IP: ' . $spammaster_ip . ' Field 1: ' . $spammasterextrafield1 . ' Field 2: ' . $spammasterextrafield2);
 
     $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
     $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
@@ -631,11 +670,11 @@ function spammaster_honeypot_validate(&$form, &$form_state) {
       ->set('spammaster.total_block_count', $spammaster_total_block_count_1)
       ->save();
 
-    $spammaster_date = date("Y-m-d H:i:s");
-    $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_honeypot_insert = db_insert('spammaster_keys')->fields([
       'date' => $spammaster_date,
-      'spamkey' => 'spammaster-firewall',
-      'spamvalue' => 'Spam Master: firewall honeypot block IP: ' . $spammaster_ip,
+      'spamkey' => 'spammaster-honeypot',
+      'spamvalue' => 'Spam Master: honeypot block IP: ' . $spammaster_ip . ' Field 1: ' . $spammasterextrafield1 . ' Field 2: ' . $spammasterextrafield2,
     ])->execute();
   }
 
