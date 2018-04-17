@@ -48,12 +48,29 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $langcode = \Drupal::currentUser()->getPreferredLangcode();
       $send = TRUE;
       $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+
       \Drupal::logger('spammaster-mail')->notice('Spam Master: mail trial license created sent To: ' . $to);
+
       drupal_set_message(t('Remember to visit Spam Master configuration page.'));
+
+      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-mail',
+        'spamvalue' => 'Spam Master: mail trial license created sent To:' . $to,
+      ])->execute();
     }
     else {
       drupal_set_message(t('Spam Master Trial license could not be created. License status is:') . ' ' . $spammaster_status . '. ' . t('Check Spam Master configuration page and read more about statuses.'), 'error');
+
       \Drupal::logger('spammaster-mail')->notice('Spam Master: mail not sent, license contains malfunction.');
+
+      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-mail',
+        'spamvalue' => 'Spam Master: mail not sent, license contains malfunction.',
+      ])->execute();
     }
   }
 
@@ -93,7 +110,15 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $langcode = \Drupal::currentUser()->getPreferredLangcode();
       $send = TRUE;
       $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+
       \Drupal::logger('spammaster-mail')->notice('Spam Master: mail trial license expired sent To: ' . $to);
+
+      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-mail',
+        'spamvalue' => 'Spam Master: mail trial license expired sent To: ' . $to,
+      ])->execute();
     }
     if ($spammaster_type == 'FULL') {
       // Email key.
@@ -118,7 +143,15 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $langcode = \Drupal::currentUser()->getPreferredLangcode();
       $send = TRUE;
       $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+
       \Drupal::logger('spammaster-mail')->notice('Spam Master: mail full license expired sent To: ' . $to);
+
+      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-mail',
+        'spamvalue' => 'Spam Master: mail full license expired sent To: ' . $to,
+      ])->execute();
     }
   }
 
@@ -157,8 +190,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $langcode = \Drupal::currentUser()->getPreferredLangcode();
     $send = TRUE;
     $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+
     // Log message.
     \Drupal::logger('spammaster-mail')->notice('Spam Master: mail license malfunction sent To: ' . $to);
+
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-mail',
+      'spamvalue' => 'Spam Master: mail license malfunction sent To: ' . $to,
+    ])->execute();
   }
 
   /**
@@ -197,8 +238,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $langcode = \Drupal::currentUser()->getPreferredLangcode();
     $send = TRUE;
     $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+
     // Log message.
     \Drupal::logger('spammaster-mail')->notice('Spam Master: mail alert level 3 sent To: ' . $to);
+
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-mail',
+      'spamvalue' => 'Spam Master: mail alert level 3 sent To: ' . $to,
+    ])->execute();
   }
 
   /**
@@ -240,12 +289,12 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     }
     $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
     if ($spammaster_total_block_count <= '10') {
-      $spam_master_block_count_result = 'Total Triggers: good, less than 10';
+      $spam_master_total_block_count_result = 'Total Triggers: good, less than 10';
     }
     if ($spammaster_total_block_count >= '11') {
-      $spam_master_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count) . ' firewall triggers & registrations blocked';
+      $spam_master_total_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count) . ' firewall triggers & registrations blocked';
     }
-    // Get count last 7 days of blocks from whatchdog.
+    // Get count last 7 days of blocks from spammaster_keys.
     $time = date('Y-m-d H:i:s');
     $time_expires = date('Y-m-d H:i:s', strtotime($time . '-1 days'));
     $spammaster_spam_watch_query = \Drupal::database()->select('spammaster_keys', 'u');
@@ -259,13 +308,13 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     ]);
     $spammaster_spam_watch_result = $spammaster_spam_watch_query->countQuery()->execute()->fetchField();
     if (empty($spammaster_spam_watch_result)) {
-      $spam_master_daily_block_count_result = 'Weekly Triggers: good, nothing to report';
+      $spam_master_block_count_result = 'Weekly Triggers: good, nothing to report';
     }
     else {
-      $spam_master_daily_block_count_result = 'Weekly Triggers: ' . number_format($spammaster_spam_watch_result) . ' firewall triggers';
+      $spam_master_block_count_result = 'Weekly Triggers: ' . number_format($spammaster_spam_watch_result);
     }
     // Email Content.
-    $spam_master_table_content = 'Spam Master daily Report for ' . $spammaster_site_name . '.';
+    $spam_master_table_content = 'Spam Master Daily Report for ' . $spammaster_site_name . '.';
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_warning;
@@ -276,7 +325,8 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spam_master_table_content .= 'Spam Probability: ' . $spammaster_license_probability . '%';
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= 'Protected Against: ' . number_format($spammaster_license_protection) . ' million threats';
-    $spam_master_table_content .= $spam_master_daily_block_count_result;
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= $spam_master_total_block_count_result;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_block_count_result;
     $spam_master_table_content .= "\r\n";
@@ -294,8 +344,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $langcode = \Drupal::currentUser()->getPreferredLangcode();
     $send = TRUE;
     $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+
     // Log message.
     \Drupal::logger('spammaster-mail')->notice('Spam Master: mail daily sent To: ' . $to);
+
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-mail',
+      'spamvalue' => 'Spam Master: mail daily sent To: ' . $to,
+    ])->execute();
   }
 
   /**
@@ -337,15 +395,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     }
     $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
     if ($spammaster_total_block_count <= '10') {
-      $spam_master_block_count_result = 'Total Triggers: good, less than 10';
+      $spam_master_total_block_count_result = 'Total Triggers: good, less than 10';
     }
     if ($spammaster_total_block_count >= '11') {
-      $spam_master_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count) . ' firewall triggers & registrations blocked';
+      $spam_master_total_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count);
     }
     $spammaster_license_alert_level = $spammaster_settings->get('spammaster.license_alert_level');
-    // Get count last 7 days of blocks from spammaster_keys.
+    // Set 7 days time.
     $time = date('Y-m-d H:i:s');
-    $time_expires = date('Y-m-d H:i:s', strtotime($time . '-1 days'));
+    $time_expires = date('Y-m-d H:i:s', strtotime($time . '-7 days'));
+    // Get count last 7 days of blocks from spammaster_keys.
     $spammaster_spam_watch_query = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_spam_watch_query->fields('u', ['spamkey']);
     $spammaster_spam_watch_query->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
@@ -357,10 +416,10 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     ]);
     $spammaster_spam_watch_result = $spammaster_spam_watch_query->countQuery()->execute()->fetchField();
     if (empty($spammaster_spam_watch_result)) {
-      $spam_master_daily_block_count_result = 'Weekly Triggers: good, nothing to report';
+      $spam_master_block_count_result = 'Weekly Total Triggers: good, nothing to report';
     }
     else {
-      $spam_master_daily_block_count_result = 'Weekly Triggers: ' . number_format($spammaster_spam_watch_result) . ' firewall triggers';
+      $spam_master_block_count_result = 'Weekly Total Triggers: ' . number_format($spammaster_spam_watch_result);
     }
     $spammaster_buffer_size = \Drupal::database()->select('spammaster_threats', 'u');
     $spammaster_buffer_size->fields('u', ['threat']);
@@ -371,35 +430,77 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     else {
       $spammaster_buffer_size_result_count = $spammaster_buffer_size_result;
     }
+    // Get count last 7 days of firewall from spammaster_keys.
+    $spammaster_firewall_size = \Drupal::database()->select('spammaster_keys', 'u');
+    $spammaster_firewall_size->fields('u', ['spamkey']);
+    $spammaster_firewall_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
+    $spammaster_firewall_size->where('(spamkey = :firewall)', [':firewall' => 'spammaster-firewall']);
+    $spammaster_firewall_size_result = $spammaster_firewall_size->countQuery()->execute()->fetchField();
+    if (empty($spammaster_firewall_size_result)) {
+      $spam_master_firewall_count_result = 'Weekly Firewall Triggers: 0';
+    }
+    else {
+      $spam_master_firewall_count_result = 'Weekly Firewall Triggers: ' . number_format($spammaster_firewall_size_result);
+    }
+    // Get count last 7 days of registrations from spammaster_keys.
     $spammaster_registration_size = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_registration_size->fields('u', ['spamkey']);
+    $spammaster_registration_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
     $spammaster_registration_size->where('(spamkey = :registration)', [':registration' => 'spammaster-registration']);
     $spammaster_registration_size_result = $spammaster_registration_size->countQuery()->execute()->fetchField();
     if (empty($spammaster_registration_size_result)) {
-      $spam_master_registration_count_result = 'Total Registrations Blocked: 0';
+      $spam_master_registration_count_result = 'Weekly Registrations Triggers: 0';
     }
     else {
-      $spam_master_registration_count_result = 'Total Registrations Blocked: ' . number_format($spammaster_registration_size_result);
+      $spam_master_registration_count_result = 'Weekly Registrations Triggers: ' . number_format($spammaster_registration_size_result);
     }
+    // Get count last 7 days of comment from spammaster_keys.
     $spammaster_comment_size = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_comment_size->fields('u', ['spamkey']);
+    $spammaster_comment_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
     $spammaster_comment_size->where('(spamkey = :comment)', [':comment' => 'spammaster-comment']);
     $spammaster_comment_size_result = $spammaster_comment_size->countQuery()->execute()->fetchField();
     if (empty($spammaster_comment_size_result)) {
-      $spam_master_comment_count_result = 'Total Comments Blocked: 0';
+      $spam_master_comment_count_result = 'Weekly Comments Triggers: 0';
     }
     else {
-      $spam_master_comment_count_result = 'Total Comments Blocked: ' . number_format($spammaster_comment_size_result);
+      $spam_master_comment_count_result = 'Weekly Comments Triggers: ' . number_format($spammaster_comment_size_result);
     }
+    // Get count last 7 days of contact from spammaster_keys.
     $spammaster_contact_size = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_contact_size->fields('u', ['spamkey']);
+    $spammaster_contact_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
     $spammaster_contact_size->where('(spamkey = :contact)', [':contact' => 'spammaster-contact']);
     $spammaster_contact_size_result = $spammaster_contact_size->countQuery()->execute()->fetchField();
     if (empty($spammaster_contact_size_result)) {
-      $spam_master_contact_count_result = 'Total Contacts Blocked: 0';
+      $spam_master_contact_count_result = 'Weekly Contacts Triggers: 0';
     }
     else {
-      $spam_master_contact_count_result = 'Total Contacts Blocked: ' . number_format($spammaster_contact_size_result);
+      $spam_master_contact_count_result = 'Weekly Contacts Triggers: ' . number_format($spammaster_contact_size_result);
+    }
+    // Get count last 7 days of honeypot from spammaster_keys.
+    $spammaster_honeypot_size = \Drupal::database()->select('spammaster_keys', 'u');
+    $spammaster_honeypot_size->fields('u', ['spamkey']);
+    $spammaster_honeypot_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
+    $spammaster_honeypot_size->where('(spamkey = :honeypot)', [':honeypot' => 'spammaster-honeypot']);
+    $spammaster_honeypot_size_result = $spammaster_honeypot_size->countQuery()->execute()->fetchField();
+    if (empty($spammaster_honeypot_size_result)) {
+      $spam_master_honeypot_count_result = 'Weekly Honeypot Trigers: 0';
+    }
+    else {
+      $spam_master_honeypot_count_result = 'Weekly Honeypot Trigers: ' . number_format($spammaster_honeypot_size_result);
+    }
+    // Get count last 7 days of recaptcha from spammaster_keys.
+    $spammaster_recaptcha_size = \Drupal::database()->select('spammaster_keys', 'u');
+    $spammaster_recaptcha_size->fields('u', ['spamkey']);
+    $spammaster_recaptcha_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
+    $spammaster_recaptcha_size->where('(spamkey = :recaptcha)', [':recaptcha' => 'spammaster-recaptcha']);
+    $spammaster_recaptcha_size_result = $spammaster_recaptcha_size->countQuery()->execute()->fetchField();
+    if (empty($spammaster_recaptcha_size_result)) {
+      $spam_master_recaptcha_count_result = 'Weekly reCaptcha Triggers: 0';
+    }
+    else {
+      $spam_master_recaptcha_count_result = 'Weekly reCaptcha Triggers: ' . number_format($spammaster_recaptcha_size_result);
     }
     // Email Content.
     $spam_master_table_content = 'Spam Master weekly report for ' . $spammaster_site_name . '.';
@@ -412,9 +513,14 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spam_master_table_content .= 'Spam Probability: ' . $spammaster_license_probability . '%';
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= 'Protected Against: ' . number_format($spammaster_license_protection) . ' million threats';
-    $spam_master_table_content .= $spam_master_daily_block_count_result;
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= 'Spam Buffer Size: ' . number_format($spammaster_buffer_size_result_count);
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= $spam_master_total_block_count_result;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_block_count_result;
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= $spam_master_firewall_count_result;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_registration_count_result;
     $spam_master_table_content .= "\r\n";
@@ -422,7 +528,9 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_contact_count_result;
     $spam_master_table_content .= "\r\n";
-    $spam_master_table_content .= 'Spam Buffer Size: ' . number_format($spammaster_buffer_size_result_count);
+    $spam_master_table_content .= $spam_master_honeypot_count_result;
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= $spam_master_recaptcha_count_result;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_warning_signature;
@@ -441,8 +549,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $langcode = \Drupal::currentUser()->getPreferredLangcode();
     $send = TRUE;
     $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+
     // Log message.
     \Drupal::logger('spammaster-mail')->notice('Spam Master: mail weekly sent To: ' . $to);
+
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-mail',
+      'spamvalue' => 'Spam Master: mail weekly sent To: ' . $to,
+    ])->execute();
   }
 
   /**
@@ -458,6 +574,8 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $to = 'c3RhdHNAdGVjaGdhc3AuY29t';
     $spammaster_settings = \Drupal::config('spammaster.settings');
     $response_key = $spammaster_settings->get('spammaster.license_status');
+    $spammaster_version = $spammaster_settings->get('spammaster.version');
+    $spammaster_platform_version = \Drupal::VERSION;
     if ($response_key == 'VALID') {
       $spam_master_warning = 'Your license status is Valid & Online.';
       $spam_master_warning_signature = 'All is good.';
@@ -484,15 +602,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     }
     $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
     if ($spammaster_total_block_count <= '10') {
-      $spam_master_block_count_result = 'Total Triggers: good, less than 10';
+      $spam_master_total_block_count_result = 'Total Triggers: good, less than 10';
     }
     if ($spammaster_total_block_count >= '11') {
-      $spam_master_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count) . ' firewall triggers & registrations blocked';
+      $spam_master_total_block_count_result = 'Total Triggers: ' . number_format($spammaster_total_block_count) . ' firewall triggers & registrations blocked';
     }
     $spammaster_license_alert_level = $spammaster_settings->get('spammaster.license_alert_level');
-    // Get count last 7 days of blocks from spammaster_keys.
+    // Set 7 days time.
     $time = date('Y-m-d H:i:s');
-    $time_expires = date('Y-m-d H:i:s', strtotime($time . '-1 days'));
+    $time_expires = date('Y-m-d H:i:s', strtotime($time . '-7 days'));
+    // Get count last 7 days of blocks from spammaster_keys.
     $spammaster_spam_watch_query = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_spam_watch_query->fields('u', ['spamkey']);
     $spammaster_spam_watch_query->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
@@ -504,10 +623,10 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     ]);
     $spammaster_spam_watch_result = $spammaster_spam_watch_query->countQuery()->execute()->fetchField();
     if (empty($spammaster_spam_watch_result)) {
-      $spam_master_daily_block_count_result = 'Weekly Triggers: good, nothing to report';
+      $spam_master_block_count_result = 'Weekly Total Triggers: good, nothing to report';
     }
     else {
-      $spam_master_daily_block_count_result = 'Weekly Triggers: ' . number_format($spammaster_spam_watch_result) . ' firewall triggers';
+      $spam_master_block_count_result = 'Weekly Total Triggers: ' . number_format($spammaster_spam_watch_result);
     }
     $spammaster_buffer_size = \Drupal::database()->select('spammaster_threats', 'u');
     $spammaster_buffer_size->fields('u', ['threat']);
@@ -518,38 +637,84 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     else {
       $spammaster_buffer_size_result_count = $spammaster_buffer_size_result;
     }
+    // Get count last 7 days of firewall from spammaster_keys.
+    $spammaster_firewall_size = \Drupal::database()->select('spammaster_keys', 'u');
+    $spammaster_firewall_size->fields('u', ['spamkey']);
+    $spammaster_firewall_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
+    $spammaster_firewall_size->where('(spamkey = :firewall)', [':firewall' => 'spammaster-firewall']);
+    $spammaster_firewall_size_result = $spammaster_firewall_size->countQuery()->execute()->fetchField();
+    if (empty($spammaster_firewall_size_result)) {
+      $spam_master_firewall_count_result = 'Weekly Firewall Triggers: 0';
+    }
+    else {
+      $spam_master_firewall_count_result = 'Weekly Firewall Triggers: ' . number_format($spammaster_firewall_size_result);
+    }
+    // Get count last 7 days of registrations from spammaster_keys.
     $spammaster_registration_size = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_registration_size->fields('u', ['spamkey']);
+    $spammaster_registration_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
     $spammaster_registration_size->where('(spamkey = :registration)', [':registration' => 'spammaster-registration']);
     $spammaster_registration_size_result = $spammaster_registration_size->countQuery()->execute()->fetchField();
     if (empty($spammaster_registration_size_result)) {
-      $spam_master_registration_count_result = 'Total Registrations Blocked: 0';
+      $spam_master_registration_count_result = 'Weekly Registrations Triggers: 0';
     }
     else {
-      $spam_master_registration_count_result = 'Total Registrations Blocked: ' . $spammaster_registration_size_result;
+      $spam_master_registration_count_result = 'Weekly Registrations Triggers: ' . number_format($spammaster_registration_size_result);
     }
+    // Get count last 7 days of comment from spammaster_keys.
     $spammaster_comment_size = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_comment_size->fields('u', ['spamkey']);
+    $spammaster_comment_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
     $spammaster_comment_size->where('(spamkey = :comment)', [':comment' => 'spammaster-comment']);
     $spammaster_comment_size_result = $spammaster_comment_size->countQuery()->execute()->fetchField();
     if (empty($spammaster_comment_size_result)) {
-      $spam_master_comment_count_result = 'Total Comments Blocked: 0';
+      $spam_master_comment_count_result = 'Weekly Comments Triggers: 0';
     }
     else {
-      $spam_master_comment_count_result = 'Total Comments Blocked: ' . $spammaster_comment_size_result;
+      $spam_master_comment_count_result = 'Weekly Comments Triggers: ' . number_format($spammaster_comment_size_result);
     }
+    // Get count last 7 days of contact from spammaster_keys.
     $spammaster_contact_size = \Drupal::database()->select('spammaster_keys', 'u');
     $spammaster_contact_size->fields('u', ['spamkey']);
+    $spammaster_contact_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
     $spammaster_contact_size->where('(spamkey = :contact)', [':contact' => 'spammaster-contact']);
     $spammaster_contact_size_result = $spammaster_contact_size->countQuery()->execute()->fetchField();
     if (empty($spammaster_contact_size_result)) {
-      $spam_master_contact_count_result = 'Total Contacts Blocked: 0';
+      $spam_master_contact_count_result = 'Weekly Contacts Triggers: 0';
     }
     else {
-      $spam_master_contact_count_result = 'Total Contacts Blocked: ' . $spammaster_contact_size_result;
+      $spam_master_contact_count_result = 'Weekly Contacts Triggers: ' . number_format($spammaster_contact_size_result);
+    }
+    // Get count last 7 days of honeypot from spammaster_keys.
+    $spammaster_honeypot_size = \Drupal::database()->select('spammaster_keys', 'u');
+    $spammaster_honeypot_size->fields('u', ['spamkey']);
+    $spammaster_honeypot_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
+    $spammaster_honeypot_size->where('(spamkey = :honeypot)', [':honeypot' => 'spammaster-honeypot']);
+    $spammaster_honeypot_size_result = $spammaster_honeypot_size->countQuery()->execute()->fetchField();
+    if (empty($spammaster_honeypot_size_result)) {
+      $spam_master_honeypot_count_result = 'Weekly Honeypot Trigers: 0';
+    }
+    else {
+      $spam_master_honeypot_count_result = 'Weekly Honeypot Trigers: ' . number_format($spammaster_honeypot_size_result);
+    }
+    // Get count last 7 days of recaptcha from spammaster_keys.
+    $spammaster_recaptcha_size = \Drupal::database()->select('spammaster_keys', 'u');
+    $spammaster_recaptcha_size->fields('u', ['spamkey']);
+    $spammaster_recaptcha_size->where('(date BETWEEN :time_expires AND :time)', [':time_expires' => $time_expires, ':time' => $time]);
+    $spammaster_recaptcha_size->where('(spamkey = :recaptcha)', [':recaptcha' => 'spammaster-recaptcha']);
+    $spammaster_recaptcha_size_result = $spammaster_recaptcha_size->countQuery()->execute()->fetchField();
+    if (empty($spammaster_recaptcha_size_result)) {
+      $spam_master_recaptcha_count_result = 'Weekly reCaptcha Triggers: 0';
+    }
+    else {
+      $spam_master_recaptcha_count_result = 'Weekly reCaptcha Triggers: ' . number_format($spammaster_recaptcha_size_result);
     }
     // Email Content.
     $spam_master_table_content = 'Spam Master weekly report for ' . $spammaster_site_name . '.';
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= 'Drupal Version: ' . $spammaster_platform_version;
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= 'Spam Master Version: ' . $spammaster_version;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= 'Alert Level: ' . $spam_master_alert_level_deconstructed;
     $spam_master_table_content .= "\r\n";
@@ -557,9 +722,13 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= 'Protected Against: ' . number_format($spammaster_license_protection) . ' million threats';
     $spam_master_table_content .= "\r\n";
-    $spam_master_table_content .= $spam_master_daily_block_count_result;
+    $spam_master_table_content .= 'Spam Buffer Size: ' . number_format($spammaster_buffer_size_result_count);
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= $spam_master_total_block_count_result;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_block_count_result;
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= $spam_master_firewall_count_result;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_registration_count_result;
     $spam_master_table_content .= "\r\n";
@@ -567,7 +736,9 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= $spam_master_contact_count_result;
     $spam_master_table_content .= "\r\n";
-    $spam_master_table_content .= 'Spam Buffer Size: ' . number_format($spammaster_buffer_size_result_count);
+    $spam_master_table_content .= $spam_master_honeypot_count_result;
+    $spam_master_table_content .= "\r\n";
+    $spam_master_table_content .= $spam_master_recaptcha_count_result;
     $spam_master_table_content .= "\r\n";
     $spam_master_table_content .= 'Spam Master Statistics powered by TechGasp Drupal.';
     $spam_master_table_content .= "\r\n";
@@ -577,8 +748,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $langcode = \Drupal::currentUser()->getPreferredLangcode();
     $send = TRUE;
     $result = $mailManager->mail($module, $key, base64_decode($to), $langcode, $params, NULL, $send);
+
     // Log message.
     \Drupal::logger('spammaster-mail')->notice('Spam Master: mail help us improve was successfully sent');
+
+    $spammaster_date = date('Y-m-d H:i:s');
+    $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-mail',
+      'spamvalue' => 'Spam Master: mail help us improve was successfully sent',
+    ])->execute();
   }
 
 }

@@ -61,3 +61,11 @@ spammaster.spammasterstatistics:
     _title: 'Spam Master Statistics'
   requirements:
     _permission: 'access content'
+    
+spammaster.spammastercleanupkeys:
+  path: '/spammaster'
+  defaults:
+    _controller: '\Drupal\spammaster\Controller\SpamMasterCleanUpController::spammastercleanupkeys'
+    _title: 'Spam Master CleanUp'
+  requirements:
+    _permission: 'access content'

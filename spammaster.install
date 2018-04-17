@@ -18,7 +18,7 @@ function spammaster_install() {
   ]);
   // Set spam master version necessary license creation data.
   \Drupal::configFactory()->getEditable('spammaster.settings')
-    ->set('spammaster.version', '1.0-rc3')
+    ->set('spammaster.version', '1.0-rc4')
     ->set('spammaster.block_message', 'Your Email, Domain, or Ip are banned.')
     ->set('spammaster.basic_firewall', '1')
     ->set('spammaster.basic_registration', '1')

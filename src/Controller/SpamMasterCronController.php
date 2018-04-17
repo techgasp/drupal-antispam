@@ -56,6 +56,8 @@ class SpamMasterCronController extends ControllerBase {
       if ($spammaster_email_improve != 0) {
         $spammaster_mail_help_report = $spammaster_mail_controller->spammastermailhelpreport();
       }
+      $spammaster_cleanup_controller = new SpamMasterCleanUpController();
+      $spammaster_cleanup_keys = $spammaster_cleanup_controller->spammastercleanupkeys();
     }
   }
 

@@ -54,8 +54,8 @@ class SpamMasterLicController extends ControllerBase {
     $request = $client->post(base64_decode($spammaster_license_url), [
       'form_params' => [
         'spam_license_key' => $spammaster_license,
-        'platform' => $spammaster_platform_version,
-        'platform_version' => $spammaster_platform,
+        'platform' => $spammaster_platform,
+        'platform_version' => $spammaster_platform_version,
         'platform_type' => $spammaster_multisite_joined,
         'spam_master_version' => $spammaster_version,
         'spam_master_type' => $spammaster_n_websites,
@@ -107,10 +107,24 @@ class SpamMasterLicController extends ControllerBase {
       drupal_set_message('License key ' . $spammaster_license . ' status is: ' . $spammaster_status . '. Warning! Correct your license, <a href="@spammaster_url">About Statuses</a>.', ['@spammaster_url' => 'https://spammaster.techgasp.com/documentation/'], 'error');
       // Log message.
       \Drupal::logger('spammaster-license')->notice('Spam Master: license manual status check: ' . $spammaster_status);
+      // Spam Master log.
+      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-license',
+        'spamvalue' => 'Spam Master: license manual status check: ' . $spammaster_status,
+      ])->execute();
     }
     else {
       // Log message.
       \Drupal::logger('spammaster-license')->notice('Spam Master: license manual status check: ' . $spammaster_status);
+      // Spam Master log.
+      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-license',
+        'spamvalue' => 'Spam Master: license manual status check: ' . $spammaster_status,
+      ])->execute();
     }
   }
 
@@ -118,6 +132,7 @@ class SpamMasterLicController extends ControllerBase {
    * {@inheritdoc}
    */
   public function spammasterlicdaily() {
+
     // Get variables.
     $site_settings = \Drupal::config('system.site');
     $spammaster_site_name = $site_settings->get('name');
@@ -160,8 +175,8 @@ class SpamMasterLicController extends ControllerBase {
       $request = $client->post(base64_decode($spammaster_license_url), [
         'form_params' => [
           'spam_license_key' => $spammaster_license,
-          'platform' => $spammaster_platform_version,
-          'platform_version' => $spammaster_platform,
+          'platform' => $spammaster_platform,
+          'platform_version' => $spammaster_platform_version,
           'platform_type' => $spammaster_multisite_joined,
           'spam_master_version' => $spammaster_version,
           'spam_master_type' => $spammaster_n_websites,
@@ -215,6 +230,13 @@ class SpamMasterLicController extends ControllerBase {
       if ($spammaster_status == 'INACTIVE' || $spammaster_status == 'MALFUNCTION_1' || $spammaster_status == 'MALFUNCTION_2' || $spammaster_status == 'MALFUNCTION_3') {
         // Log Status.
         \Drupal::logger('spammaster-cron')->notice('Spam Master: cron license warning. Status: ' . $spammaster_status);
+        // Spam Master log.
+        $spammaster_date = date('Y-m-d H:i:s');
+        $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+          'date' => $spammaster_date,
+          'spamkey' => 'spammaster-cron',
+          'spamvalue' => 'Spam Master: cron license warning. Status: ' . $spammaster_status,
+        ])->execute();
 
         // Call Mail Controller function.
         $spammaster_lic_malfunction = $spammaster_mail_controller->spammasterlicmalfunctions();
@@ -222,6 +244,13 @@ class SpamMasterLicController extends ControllerBase {
       if ($spammaster_status == 'EXPIRED') {
         // Log Status.
         \Drupal::logger('spammaster-cron')->notice('Spam Master: cron license warning. Status: ' . $spammaster_status);
+        // Spam Master log.
+        $spammaster_date = date('Y-m-d H:i:s');
+        $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+          'date' => $spammaster_date,
+          'spamkey' => 'spammaster-cron',
+          'spamvalue' => 'Spam Master: cron license warning. Status: ' . $spammaster_status,
+        ])->execute();
 
         // Call Mail Controller function.
         $spammaster_lic_expired = $spammaster_mail_controller->spammasterlicexpired();
@@ -229,10 +258,24 @@ class SpamMasterLicController extends ControllerBase {
       if ($spammaster_status == 'VALID') {
         // Log Status.
         \Drupal::logger('spammaster-cron')->notice('Spam Master: cron license success. Status: ' . $spammaster_status);
+        // Spam Master log.
+        $spammaster_date = date('Y-m-d H:i:s');
+        $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+          'date' => $spammaster_date,
+          'spamkey' => 'spammaster-cron',
+          'spamvalue' => 'Spam Master: cron license success. Status: ' . $spammaster_status,
+        ])->execute();
       }
       if ($spammaster_license_alert_level == 'ALERT_3') {
         // Log alert level 3.
         \Drupal::logger('spammaster-cron')->notice('Spam Master: cron alert level 3 detected.');
+        // Spam Master log.
+        $spammaster_date = date('Y-m-d H:i:s');
+        $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
+          'date' => $spammaster_date,
+          'spamkey' => 'spammaster-cron',
+          'spamvalue' => 'Spam Master: cron alert level 3 detected.',
+        ])->execute();
 
         // Call Mail Controller function.
         $spammaster_lic_alert_level_3 = $spammaster_mail_controller->spammasterlicalertlevel3();
