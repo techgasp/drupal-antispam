@@ -12,10 +12,14 @@ use Drupal\spammaster\Controller\SpamMasterCommentController;
 use Drupal\spammaster\Controller\SpamMasterContactController;
 use Drupal\Core\Url;
 
+define('SPAMMASTER_VERSION', '1.0-rc6');
+
 /**
  * Implements hook_help().
  */
 function spammaster_help($process_name, RouteMatchInterface $route_match) {
+
+  $spammaster_version = constant('SPAMMASTER_VERSION');
 
   switch ($process_name) {
     case 'help.page.spammaster':
@@ -24,6 +28,8 @@ function spammaster_help($process_name, RouteMatchInterface $route_match) {
       $output_help .= '<p>' . t('Spam Master uses real time anti-spam blocking lists provided by https://spammaster.techgasp.com.') . '</p>';
       $output_help .= '<p>' . t('Spam Master checks ips, ranges, emails, domains and words or text via heuristics.') . '</p>';
       $output_help .= '<p>' . t('Spam Master can be implemented on new registrations, logins, new comments and threads.') . '</p>';
+      $output_help .= '<h3>' . t('Version') . '</h3>';
+      $output_help .= '<p>' . t('Your Spam Master version is:') . ' ' . $spammaster_version . '</p>';
       $output_help .= '<h3>' . t('Options') . '</h3>';
       $output_help .= '<p>' . t('Spam Master is packed with otions and statistics, please visit the module configuration page.') . '</p>';
       $output_help .= '<h3>' . t('Configuration') . '</h3>';
@@ -556,7 +562,7 @@ function spammaster_recaptcha_validate(&$form, &$form_state) {
   $extra_recaptcha_api_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_key');
   $extra_recaptcha_api_secret_key = $spammaster_settings->get('spammaster.extra_recaptcha_api_secret_key');
 
-  if (isset($_POST['g-recaptcha-response'])){
+  if (isset($_POST['g-recaptcha-response'])) {
     $client = \Drupal::httpClient();
     $response = $client->get('https://www.google.com/recaptcha/api/siteverify?secret=' . $extra_recaptcha_api_secret_key . '&response=' . $_POST['g-recaptcha-response']);
     $response = json_decode($response->getBody(), TRUE);

@@ -574,7 +574,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $to = 'c3RhdHNAdGVjaGdhc3AuY29t';
     $spammaster_settings = \Drupal::config('spammaster.settings');
     $response_key = $spammaster_settings->get('spammaster.license_status');
-    $spammaster_version = $spammaster_settings->get('spammaster.version');
+    $spammaster_version = constant('SPAMMASTER_VERSION');
     $spammaster_platform_version = \Drupal::VERSION;
     if ($response_key == 'VALID') {
       $spam_master_warning = 'Your license status is Valid & Online.';

@@ -27,7 +27,7 @@ class SpamMasterLicController extends ControllerBase {
     $spammaster_platform_type = 'NO';
     $spammaster_n_websites = '0';
     $spammaster_multisite_joined = $spammaster_platform_type . ' - ' . $spammaster_n_websites;
-    $spammaster_version = $spammaster_settings->get('spammaster.version');
+    $spammaster_version = constant('SPAMMASTER_VERSION');
     $spammaster_type = $spammaster_settings->get('spammaster.type');
     $spammaster_cron = "MAN";
     $spammaster_site_name = $site_settings->get('name');
@@ -148,7 +148,7 @@ class SpamMasterLicController extends ControllerBase {
       $spammaster_platform_type = 'NO';
       $spammaster_n_websites = '0';
       $spammaster_multisite_joined = $spammaster_platform_type . ' - ' . $spammaster_n_websites;
-      $spammaster_version = $spammaster_settings->get('spammaster.version');
+      $spammaster_version = constant('SPAMMASTER_VERSION');
       $spammaster_type = $spammaster_settings->get('spammaster.type');
       $spammaster_cron = "TRUE";
       $spammaster_site_name = $site_settings->get('name');

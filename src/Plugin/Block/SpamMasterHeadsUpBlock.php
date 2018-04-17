@@ -44,7 +44,7 @@ class SpamMasterHeadsUpBlock extends BlockBase {
     $image_inactive = 'check-inactive.png';
     // Get module settings.
     $spammaster_settings = \Drupal::config('spammaster.settings');
-    $protection_engine_version = $spammaster_settings->get('spammaster.version');
+    $protection_engine_version = constant('SPAMMASTER_VERSION');
     $protection_license_protection = number_format($spammaster_settings->get('spammaster.license_protection'));
     // Check for SSL.
     if (isset($_SERVER["HTTPS"])) {
