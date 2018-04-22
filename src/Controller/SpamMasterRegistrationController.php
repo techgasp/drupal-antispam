@@ -27,8 +27,9 @@ class SpamMasterRegistrationController extends ControllerBase {
     $spammaster_settings = \Drupal::config('spammaster.settings');
     $spammaster_license = $spammaster_settings->get('spammaster.license_key');
     $spammaster_status = $spammaster_settings->get('spammaster.license_status');
-    $spammaster_block_message = $spammaster_settings->get('spammaster.block_message');
     $spammaster_total_block_count = $spammaster_settings->get('spammaster.total_block_count');
+    $spammaster_settings_protection = \Drupal::config('spammaster.settings_protection');
+    $spammaster_block_message = $spammaster_settings_protection->get('spammaster.block_message');
     $blog_threat_ip = \Drupal::request()->getClientIp();
     if ($spammaster_status == 'VALID' || $spammaster_status == 'MALFUNCTION_1' || $spammaster_status == 'MALFUNCTION_2') {
       // Local db check.
@@ -85,7 +86,7 @@ class SpamMasterRegistrationController extends ControllerBase {
         }
         $blog_threat_email = $spammasteremail;
         $blog_threat_content = 'registration';
-        $blog_web_address = \Drupal::request()->getHost();;
+        $blog_web_address = \Drupal::request()->getHost();
         $address_unclean = $blog_web_address;
         $address = preg_replace('#^https?://#', '', $address_unclean);
         @$blog_server_ip = $_SERVER['SERVER_ADDR'];

@@ -32,6 +32,8 @@ class SpamMasterLicController extends ControllerBase {
     $spammaster_cron = "MAN";
     $spammaster_site_name = $site_settings->get('name');
     $spammaster_site_url = \Drupal::request()->getHost();
+    $address_unclean = $spammaster_site_url;
+    $address = preg_replace('#^https?://#', '', $address_unclean);
     $spammaster_admin = $user_settings->get('name')->value;
     $spammaster_admin_email = $site_settings->get('mail');
     $spammaster_ip = $_SERVER['SERVER_ADDR'];
@@ -60,7 +62,7 @@ class SpamMasterLicController extends ControllerBase {
         'spam_master_version' => $spammaster_version,
         'spam_master_type' => $spammaster_n_websites,
         'blog_name' => $spammaster_site_name,
-        'blog_address' => $spammaster_site_url,
+        'blog_address' => $address,
         'blog_admin' => $spammaster_admin,
         'blog_email' => $spammaster_admin_email,
         'blog_hostname' => $spammaster_hostname,
@@ -104,7 +106,7 @@ class SpamMasterLicController extends ControllerBase {
 
     // Display status to user.
     if ($spammaster_status == 'INACTIVE' || $spammaster_status == 'MALFUNCTION_1' || $spammaster_status == 'MALFUNCTION_2' || $spammaster_status == 'MALFUNCTION_3' || $spammaster_status == 'EXPIRED') {
-      drupal_set_message('License key ' . $spammaster_license . ' status is: ' . $spammaster_status . '. Warning! Correct your license, <a href="@spammaster_url">About Statuses</a>.', ['@spammaster_url' => 'https://spammaster.techgasp.com/documentation/'], 'error');
+      drupal_set_message('License key ' . $spammaster_license . ' status is: ' . $spammaster_status . '. Check Spam Master configuration page and read more about statuses.', 'error');
       // Log message.
       \Drupal::logger('spammaster-license')->notice('Spam Master: license manual status check: ' . $spammaster_status);
       // Spam Master log.
@@ -153,6 +155,8 @@ class SpamMasterLicController extends ControllerBase {
       $spammaster_cron = "TRUE";
       $spammaster_site_name = $site_settings->get('name');
       $spammaster_site_url = \Drupal::request()->getHost();
+      $address_unclean = $spammaster_site_url;
+      $address = preg_replace('#^https?://#', '', $address_unclean);
       $spammaster_admin = $user_settings->get('name')->value;
       $spammaster_admin_email = $site_settings->get('mail');
       $spammaster_ip = $_SERVER['SERVER_ADDR'];
@@ -181,7 +185,7 @@ class SpamMasterLicController extends ControllerBase {
           'spam_master_version' => $spammaster_version,
           'spam_master_type' => $spammaster_n_websites,
           'blog_name' => $spammaster_site_name,
-          'blog_address' => $spammaster_site_url,
+          'blog_address' => $address,
           'blog_admin' => $spammaster_admin,
           'blog_email' => $spammaster_admin_email,
           'blog_hostname' => $spammaster_hostname,

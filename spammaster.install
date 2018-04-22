@@ -17,7 +17,7 @@ function spammaster_install() {
     'generate spam master' => TRUE,
   ]);
   // Set spam master version necessary license creation data.
-  \Drupal::configFactory()->getEditable('spammaster.settings')
+  \Drupal::configFactory()->getEditable('spammaster.settings_protection')
     ->set('spammaster.block_message', 'Your Email, Domain, or Ip are banned.')
     ->set('spammaster.basic_firewall', '1')
     ->set('spammaster.basic_registration', '1')
@@ -28,11 +28,11 @@ function spammaster_install() {
     ->set('spammaster.extra_recaptcha_registration', '0')
     ->set('spammaster.extra_recaptcha_comment', '0')
     ->set('spammaster.extra_recaptcha_contact', '0')
-    ->set('spammaster.extra_honeypot', '0')
-    ->set('spammaster.extra_honeypot_login', '0')
-    ->set('spammaster.extra_honeypot_registration', '0')
-    ->set('spammaster.extra_honeypot_comment', '0')
-    ->set('spammaster.extra_honeypot_contact', '0')
+    ->set('spammaster.extra_honeypot', '1')
+    ->set('spammaster.extra_honeypot_login', '1')
+    ->set('spammaster.extra_honeypot_registration', '1')
+    ->set('spammaster.extra_honeypot_comment', '1')
+    ->set('spammaster.extra_honeypot_contact', '1')
     ->set('spammaster.signature_registration', '1')
     ->set('spammaster.signature_login', '1')
     ->set('spammaster.signature_comment', '1')
@@ -59,11 +59,13 @@ function spammaster_install() {
   $spammaster_n_websites = '0';
   $spammaster_multisite_joined = $spammaster_platform_type . ' - ' . $spammaster_n_websites;
   $spammaster_version = constant('SPAMMASTER_VERSION');
-  $spammaster_type = $spammaster_settings->get('spammaster.type');
+  $spammaster_type = 'TRIAL';
   $spammaster_lic_nounce = "PW9pdXNkbmVXMndzUw==";
   $spammaster_cron = "FALSE";
   $spammaster_site_name = $site_settings->get('name');
   $spammaster_site_url = \Drupal::request()->getHost();
+  $address_unclean = $spammaster_site_url;
+  $address = preg_replace('#^https?://#', '', $address_unclean);
   $spammaster_admin = $user_settings->get('name')->value;
   $spammaster_admin_email = $site_settings->get('mail');
   @$spammaster_ip = $_SERVER['SERVER_ADDR'];
@@ -93,7 +95,7 @@ function spammaster_install() {
       'spam_master_version' => $spammaster_version,
       'spam_master_type' => $spammaster_n_websites,
       'blog_name' => $spammaster_site_name,
-      'blog_address' => $spammaster_site_url,
+      'blog_address' => $address,
       'blog_admin' => $spammaster_admin,
       'blog_email' => $spammaster_admin_email,
       'blog_hostname' => $spammaster_hostname,
@@ -138,6 +140,15 @@ function spammaster_install() {
   // MailController call.
   $spammaster_mail_controller = new SpamMasterMailController();
   $spammaster_mail_send = $spammaster_mail_controller->spammasterlictrialcreation();
+}
+
+/**
+ * Updates to module settings.
+ */
+function spammaster_update_01() {
+  // 19042018.
+  \Drupal::configFactory()->getEditable('spammaster.settings.version')
+    ->delete();
 }
 
 /**

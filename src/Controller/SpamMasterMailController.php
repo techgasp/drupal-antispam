@@ -25,6 +25,8 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spammaster_status = $spammaster_settings->get('spammaster.license_status');
     $spammaster_license_protection = $spammaster_settings->get('spammaster.license_protection');
     $to = \Drupal::currentUser()->getEmail();
+    // Set date.
+    $spammaster_date = date('Y-m-d H:i:s');
     if ($spammaster_status == 'VALID') {
       // Email Content.
       $spam_master_table_content = 'Congratulations, ' . $spammaster_site_name . ' is now protected by Spam Master against millions of threats.';
@@ -49,11 +51,18 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $send = TRUE;
       $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
 
-      \Drupal::logger('spammaster-mail')->notice('Spam Master: mail trial license created sent To: ' . $to);
-
       drupal_set_message(t('Remember to visit Spam Master configuration page.'));
 
-      $spammaster_date = date('Y-m-d H:i:s');
+      \Drupal::logger('spammaster-license')->notice('Spam Master: congratulations! trial license created.');
+
+      \Drupal::logger('spammaster-mail')->notice('Spam Master: mail trial license created sent To: ' . $to);
+
+      $spammaster_db_lic_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-license',
+        'spamvalue' => 'Spam Master: congratulations! trial license created.',
+      ])->execute();
+
       $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
         'date' => $spammaster_date,
         'spamkey' => 'spammaster-mail',
@@ -63,13 +72,20 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     else {
       drupal_set_message(t('Spam Master Trial license could not be created. License status is:') . ' ' . $spammaster_status . '. ' . t('Check Spam Master configuration page and read more about statuses.'), 'error');
 
+      \Drupal::logger('spammaster-license')->notice('Spam Master: trial license not created, contains malfunction');
+
       \Drupal::logger('spammaster-mail')->notice('Spam Master: mail not sent, license contains malfunction.');
 
-      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_lic_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-license',
+        'spamvalue' => 'Spam Master: trial license not created, contains malfunction: ' . $spammaster_status,
+      ])->execute();
+
       $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
         'date' => $spammaster_date,
         'spamkey' => 'spammaster-mail',
-        'spamvalue' => 'Spam Master: mail not sent, license contains malfunction.',
+        'spamvalue' => 'Spam Master: mail not sent, license contains malfunction:' . $spammaster_status,
       ])->execute();
     }
   }
@@ -88,6 +104,8 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spammaster_status = $spammaster_settings->get('spammaster.license_status');
     $spammaster_license_protection = $spammaster_settings->get('spammaster.license_protection');
     $spammaster_type = $spammaster_settings->get('spammaster.type');
+    // Set date.
+    $spammaster_date = date('Y-m-d H:i:s');
     if ($spammaster_type == 'TRAIL') {
       // Email key.
       $key = 'license_trial_end';
@@ -111,9 +129,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $send = TRUE;
       $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
 
+      \Drupal::logger('spammaster-license')->notice('Spam Master: trial license expired');
+
       \Drupal::logger('spammaster-mail')->notice('Spam Master: mail trial license expired sent To: ' . $to);
 
-      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_lic_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-license',
+        'spamvalue' => 'Spam Master: trial license expired.',
+      ])->execute();
+
       $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
         'date' => $spammaster_date,
         'spamkey' => 'spammaster-mail',
@@ -144,9 +169,16 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $send = TRUE;
       $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
 
+      \Drupal::logger('spammaster-license')->notice('Spam Master: full license expired.');
+
       \Drupal::logger('spammaster-mail')->notice('Spam Master: mail full license expired sent To: ' . $to);
 
-      $spammaster_date = date('Y-m-d H:i:s');
+      $spammaster_db_lic_insert = db_insert('spammaster_keys')->fields([
+        'date' => $spammaster_date,
+        'spamkey' => 'spammaster-license',
+        'spamvalue' => 'Spam Master: full license expired.',
+      ])->execute();
+
       $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
         'date' => $spammaster_date,
         'spamkey' => 'spammaster-mail',
@@ -191,10 +223,18 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $send = TRUE;
     $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
 
-    // Log message.
+    \Drupal::logger('spammaster-license')->notice('Spam Master: license malfunction detected.');
+
     \Drupal::logger('spammaster-mail')->notice('Spam Master: mail license malfunction sent To: ' . $to);
 
     $spammaster_date = date('Y-m-d H:i:s');
+
+    $spammaster_db_lic_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-license',
+      'spamvalue' => 'Spam Master: license malfunction detected.',
+    ])->execute();
+
     $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
       'date' => $spammaster_date,
       'spamkey' => 'spammaster-mail',
@@ -239,10 +279,18 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $send = TRUE;
     $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
 
-    // Log message.
+    \Drupal::logger('spammaster-license')->notice('Spam Master: alert level 3 detected.');
+
     \Drupal::logger('spammaster-mail')->notice('Spam Master: mail alert level 3 sent To: ' . $to);
 
     $spammaster_date = date('Y-m-d H:i:s');
+
+    $spammaster_db_lic_insert = db_insert('spammaster_keys')->fields([
+      'date' => $spammaster_date,
+      'spamkey' => 'spammaster-license',
+      'spamvalue' => 'Spam Master: alert level 3 detected.',
+    ])->execute();
+
     $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
       'date' => $spammaster_date,
       'spamkey' => 'spammaster-mail',
