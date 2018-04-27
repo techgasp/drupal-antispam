@@ -52,6 +52,9 @@ class SpamMasterRegistrationController extends ControllerBase {
             'threat' => $spammasterip,
           ])->execute();
         }
+        if (empty($spammasteremail)) {
+          $spammasteremail = "Spam Bot";
+        }
         $spammaster_db_email = \Drupal::database()->select('spammaster_threats', 'u');
         $spammaster_db_email->fields('u', ['threat']);
         $spammaster_db_email->where('(threat = :email)', [':email' => $spammasteremail]);
@@ -71,7 +74,7 @@ class SpamMasterRegistrationController extends ControllerBase {
         $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
           'date' => $spammaster_date,
           'spamkey' => 'spammaster-registration',
-          'spamvalue' => 'Spam Master: registration block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail,
+          'spamvalue' => 'Spam Master: registration buffer block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail,
         ])->execute();
 
         \Drupal::logger('spammaster-registration')->notice('Spam Master: registration block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail);
@@ -146,7 +149,7 @@ class SpamMasterRegistrationController extends ControllerBase {
           $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
             'date' => $spammaster_date,
             'spamkey' => 'spammaster-registration',
-            'spamvalue' => 'Spam Master: registration block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail,
+            'spamvalue' => 'Spam Master: registration rbl block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail,
           ])->execute();
         }
       }

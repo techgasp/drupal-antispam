@@ -6,7 +6,6 @@
  */
 
 use Drupal\user\RoleInterface;
-use Drupal\user\Entity\User;
 use Drupal\spammaster\Controller\SpamMasterMailController;
 
 /**
@@ -49,9 +48,6 @@ function spammaster_install() {
   // Create lic hash.
   $spammaster_lic_hash = md5(uniqid(mt_rand(), TRUE));
 
-  // Get site and admin settins.
-  $user_settings = User::load(\Drupal::currentUser()->id());
-
   // Colect data.
   $spammaster_platform = 'Drupal';
   $spammaster_platform_version = \Drupal::VERSION;
@@ -66,7 +62,6 @@ function spammaster_install() {
   $spammaster_site_url = \Drupal::request()->getHost();
   $address_unclean = $spammaster_site_url;
   $address = preg_replace('#^https?://#', '', $address_unclean);
-  $spammaster_admin = $user_settings->get('name')->value;
   $spammaster_admin_email = $site_settings->get('mail');
   @$spammaster_ip = $_SERVER['SERVER_ADDR'];
   // If empty ip.
@@ -96,7 +91,6 @@ function spammaster_install() {
       'spam_master_type' => $spammaster_n_websites,
       'blog_name' => $spammaster_site_name,
       'blog_address' => $address,
-      'blog_admin' => $spammaster_admin,
       'blog_email' => $spammaster_admin_email,
       'blog_hostname' => $spammaster_hostname,
       'blog_ip' => $spammaster_ip,

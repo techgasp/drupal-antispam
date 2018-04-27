@@ -106,7 +106,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     $spammaster_type = $spammaster_settings->get('spammaster.type');
     // Set date.
     $spammaster_date = date('Y-m-d H:i:s');
-    if ($spammaster_type == 'TRAIL') {
+    if ($spammaster_type == 'TRIAL') {
       // Email key.
       $key = 'license_trial_end';
       // Email Content.

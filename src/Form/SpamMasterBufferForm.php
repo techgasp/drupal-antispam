@@ -106,10 +106,19 @@ class SpamMasterBufferForm extends ConfigFormBase {
         ];
       }
     }
+    // Get Buffer Size.
+    $spammaster_buffer_size = \Drupal::database()->select('spammaster_threats', 'u');
+    $spammaster_buffer_size->fields('u', ['threat']);
+    $spammaster_buffer_size_result = $spammaster_buffer_size->countQuery()->execute()->fetchField();
+    $form['buffer_header']['total_buffer'] = [
+      '#markup' => '<h2>Buffer Size: <b>' . $spammaster_buffer_size_result . '</b></h2>',
+    ];
+
     // Spam Buffer Description.
-    $form['buffer_header']['description'] = [
+    $form['buffer_header']['header_description'] = [
       '#markup' => '<p>Spam Master Buffer greatly reduces server resources like cpu, memory and bandwidth by doing fast local machine checks. Also prevents major attacks like flooding, DoS , etc. via Spam Master Firewall.</p>',
     ];
+
     // Display table.
     $form['buffer_header']['table_buffer'] = [
       '#type' => 'tableselect',
@@ -130,6 +139,11 @@ class SpamMasterBufferForm extends ConfigFormBase {
     // Form pager if ore than 25 entries.
     $form['buffer_header']['pager'] = [
       '#type' => 'pager',
+    ];
+
+    // Spam Buffer Description.
+    $form['buffer_header']['footer_description'] = [
+      '#markup' => '<p>Before deleting! Spam Master Buffers for 3 months. Older Buffer entries are automatically deleted via weekly cron to keep your website clean and fast.</p>',
     ];
 
     return $form;

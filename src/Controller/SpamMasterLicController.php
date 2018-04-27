@@ -3,7 +3,6 @@
 namespace Drupal\spammaster\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\user\Entity\User;
 
 /**
  * Class controller.
@@ -20,7 +19,6 @@ class SpamMasterLicController extends ControllerBase {
     $spammaster_site_name = $site_settings->get('name');
     $spammaster_settings = \Drupal::config('spammaster.settings');
     $spammaster_license = $spammaster_settings->get('spammaster.license_key');
-    $user_settings = User::load(\Drupal::currentUser()->id());
     // Colect data.
     $spammaster_platform = 'Drupal';
     $spammaster_platform_version = \Drupal::VERSION;
@@ -34,7 +32,6 @@ class SpamMasterLicController extends ControllerBase {
     $spammaster_site_url = \Drupal::request()->getHost();
     $address_unclean = $spammaster_site_url;
     $address = preg_replace('#^https?://#', '', $address_unclean);
-    $spammaster_admin = $user_settings->get('name')->value;
     $spammaster_admin_email = $site_settings->get('mail');
     $spammaster_ip = $_SERVER['SERVER_ADDR'];
     // If empty ip.
@@ -63,7 +60,6 @@ class SpamMasterLicController extends ControllerBase {
         'spam_master_type' => $spammaster_n_websites,
         'blog_name' => $spammaster_site_name,
         'blog_address' => $address,
-        'blog_admin' => $spammaster_admin,
         'blog_email' => $spammaster_admin_email,
         'blog_hostname' => $spammaster_hostname,
         'blog_ip' => $spammaster_ip,
@@ -143,7 +139,6 @@ class SpamMasterLicController extends ControllerBase {
     $spammaster_license_status = $spammaster_settings->get('spammaster.license_status');
     $spammaster_license_alert_level = $spammaster_settings->get('spammaster.license_alert_level');
     if ($spammaster_license_status == 'VALID' || $spammaster_license_status == 'MALFUNCTION_1' || $spammaster_license_status == 'MALFUNCTION_2') {
-      $user_settings = \Drupal::entityTypeManager()->getStorage('user')->load(1);
       // Colect data.
       $spammaster_platform = 'Drupal';
       $spammaster_platform_version = \Drupal::VERSION;
@@ -157,7 +152,6 @@ class SpamMasterLicController extends ControllerBase {
       $spammaster_site_url = \Drupal::request()->getHost();
       $address_unclean = $spammaster_site_url;
       $address = preg_replace('#^https?://#', '', $address_unclean);
-      $spammaster_admin = $user_settings->get('name')->value;
       $spammaster_admin_email = $site_settings->get('mail');
       $spammaster_ip = $_SERVER['SERVER_ADDR'];
       // If empty ip.
@@ -186,7 +180,6 @@ class SpamMasterLicController extends ControllerBase {
           'spam_master_type' => $spammaster_n_websites,
           'blog_name' => $spammaster_site_name,
           'blog_address' => $address,
-          'blog_admin' => $spammaster_admin,
           'blog_email' => $spammaster_admin_email,
           'blog_hostname' => $spammaster_hostname,
           'blog_ip' => $spammaster_ip,

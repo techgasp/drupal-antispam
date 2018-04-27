@@ -41,7 +41,7 @@ class SpamMasterCommentController extends ControllerBase {
       $spammaster_spam_buffer_result = $spammaster_spam_buffer_query->execute()->fetchObject();
       $result_comment_content_trim = substr($spammastercomment, 0, 360);
       if (empty($result_comment_content_trim)) {
-        $result_comment_content_trim = 'your-message';
+        $result_comment_content_trim = 'your-comment';
       }
       // Local db positive, throw error, watchdog, insert.
       if (!empty($spammaster_spam_buffer_result)) {
@@ -57,6 +57,9 @@ class SpamMasterCommentController extends ControllerBase {
             'date' => $spammaster_date,
             'threat' => $spammasterip,
           ])->execute();
+        }
+        if (empty($spammasteremail)) {
+          $spammasteremail = "Spam Bot";
         }
         $spammaster_db_email = \Drupal::database()->select('spammaster_threats', 'u');
         $spammaster_db_email->fields('u', ['threat']);
@@ -77,7 +80,7 @@ class SpamMasterCommentController extends ControllerBase {
         $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
           'date' => $spammaster_date,
           'spamkey' => 'spammaster-comment',
-          'spamvalue' => 'Spam Master: comment block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim,
+          'spamvalue' => 'Spam Master: comment buffer block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim,
         ])->execute();
 
         \Drupal::logger('spammaster-comment')->notice('Spam Master: comment block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim);
@@ -152,7 +155,7 @@ class SpamMasterCommentController extends ControllerBase {
           $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
             'date' => $spammaster_date,
             'spamkey' => 'spammaster-comment',
-            'spamvalue' => 'Spam Master: comment block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim,
+            'spamvalue' => 'Spam Master: comment rbl block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim,
           ])->execute();
         }
       }

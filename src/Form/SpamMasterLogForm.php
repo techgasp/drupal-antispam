@@ -317,9 +317,9 @@ class SpamMasterLogForm extends ConfigFormBase {
       '#options' => $output_key,
       '#empty' => t('No log found'),
     ];
-    // Spam Buffer Description.
+    // Spam Log Description.
     $form['statistics_header']['description'] = [
-      '#markup' => '<p>Spam Master keeps logs for 3 months. Older logs are automatically deleted via weekly cron.</p>',
+      '#markup' => '<p>Before deleting! Spam Master keeps logs for 3 months. Older logs are automatically deleted via weekly cron to keep your website clean and fast.</p>',
     ];
     // Delete button at end of table, calls spammasterdeletekey function.
     $form['statistics_header']['submit'] = [

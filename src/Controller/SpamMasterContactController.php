@@ -56,6 +56,9 @@ class SpamMasterContactController extends ControllerBase {
             'threat' => $spammasterip,
           ])->execute();
         }
+        if (empty($spammasteremail)) {
+          $spammasteremail = "Spam Bot";
+        }
         $spammaster_db_email = \Drupal::database()->select('spammaster_threats', 'u');
         $spammaster_db_email->fields('u', ['threat']);
         $spammaster_db_email->where('(threat = :email)', [':email' => $spammasteremail]);
@@ -75,7 +78,7 @@ class SpamMasterContactController extends ControllerBase {
         $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
           'date' => $spammaster_date,
           'spamkey' => 'spammaster-contact',
-          'spamvalue' => 'Spam Master: contact block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim,
+          'spamvalue' => 'Spam Master: contact buffer block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim,
         ])->execute();
 
         \Drupal::logger('spammaster-contact')->notice('Spam Master: contact block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim);
@@ -150,7 +153,7 @@ class SpamMasterContactController extends ControllerBase {
           $spammaster_db_ip_insert = db_insert('spammaster_keys')->fields([
             'date' => $spammaster_date,
             'spamkey' => 'spammaster-contact',
-            'spamvalue' => 'Spam Master: contact block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim,
+            'spamvalue' => 'Spam Master: contact rbl block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim,
           ])->execute();
         }
       }
