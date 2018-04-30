@@ -110,7 +110,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       // Email key.
       $key = 'license_trial_end';
       // Email Content.
-      $spam_master_table_content = $blogname . ' is no longer protected by Spam Master against millions of threats.';
+      $spam_master_table_content = $spammaster_site_name . ' is no longer protected by Spam Master against millions of threats.';
       $spam_master_table_content .= "\r\n";
       $spam_master_table_content .= "\r\n";
       $spam_master_table_content .= 'If you enjoyed the protection you can quickly get a full license, it costs peanuts per year.';
@@ -149,7 +149,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       // Email key.
       $key = 'license_full_end';
       // Email Content.
-      $spam_master_table_content = $blogname . ' is no longer protected by Spam Master against millions of threats.';
+      $spam_master_table_content = $spammaster_site_name . ' is no longer protected by Spam Master against millions of threats.';
       $spam_master_table_content .= "\r\n";
       $spam_master_table_content .= "\r\n";
       $spam_master_table_content .= 'Hope you have enjoyed 1 year of bombastic protection. You can quickly get another license and get protected again, it costs peanuts per year.';

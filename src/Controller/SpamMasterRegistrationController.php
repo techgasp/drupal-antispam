@@ -77,7 +77,7 @@ class SpamMasterRegistrationController extends ControllerBase {
           'spamvalue' => 'Spam Master: registration buffer block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail,
         ])->execute();
 
-        \Drupal::logger('spammaster-registration')->notice('Spam Master: registration block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail);
+        \Drupal::logger('spammaster-registration')->notice('Spam Master: registration buffer block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail);
       }
       // Web api check.
       else {
@@ -141,7 +141,7 @@ class SpamMasterRegistrationController extends ControllerBase {
           // Web positive, throw error.
           $formstate->setErrorByName('mail', 'SPAM MASTER: ' . $spammaster_block_message);
           // Watchdog log.
-          \Drupal::logger('spammaster-registration')->notice('Spam Master: registration block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail);
+          \Drupal::logger('spammaster-registration')->notice('Spam Master: registration rbl block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail);
           $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
           \Drupal::configFactory()->getEditable('spammaster.settings')
             ->set('spammaster.total_block_count', $spammaster_total_block_count_1)

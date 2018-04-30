@@ -81,7 +81,7 @@ class SpamMasterContactController extends ControllerBase {
           'spamvalue' => 'Spam Master: contact buffer block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim,
         ])->execute();
 
-        \Drupal::logger('spammaster-contact')->notice('Spam Master: contact block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim);
+        \Drupal::logger('spammaster-contact')->notice('Spam Master: contact buffer block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim);
       }
       // Web api check.
       else {
@@ -145,7 +145,7 @@ class SpamMasterContactController extends ControllerBase {
           // Web positive, throw error.
           $formstate->setErrorByName('mail', 'SPAM MASTER: ' . $spammaster_block_message);
           // Watchdog log.
-          \Drupal::logger('spammaster-contact')->notice('Spam Master: contact block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim);
+          \Drupal::logger('spammaster-contact')->notice('Spam Master: contact rbl block, Ip: ' . $spammasterip . ', Email: ' . $spammasteremail . ', Message: ' . $result_message_content_trim);
           $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
           \Drupal::configFactory()->getEditable('spammaster.settings')
             ->set('spammaster.total_block_count', $spammaster_total_block_count_1)

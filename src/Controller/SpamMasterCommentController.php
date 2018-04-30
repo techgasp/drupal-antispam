@@ -58,19 +58,6 @@ class SpamMasterCommentController extends ControllerBase {
             'threat' => $spammasterip,
           ])->execute();
         }
-        if (empty($spammasteremail)) {
-          $spammasteremail = "Spam Bot";
-        }
-        $spammaster_db_email = \Drupal::database()->select('spammaster_threats', 'u');
-        $spammaster_db_email->fields('u', ['threat']);
-        $spammaster_db_email->where('(threat = :email)', [':email' => $spammasteremail]);
-        $spammaster_db_email_result = $spammaster_db_email->execute()->fetchObject();
-        if (empty($spammaster_db_email_result)) {
-          $spammaster_db_email_insert = db_insert('spammaster_threats')->fields([
-            'date' => $spammaster_date,
-            'threat' => $spammasteremail,
-          ])->execute();
-        }
 
         $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
         \Drupal::configFactory()->getEditable('spammaster.settings')
@@ -83,7 +70,7 @@ class SpamMasterCommentController extends ControllerBase {
           'spamvalue' => 'Spam Master: comment buffer block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim,
         ])->execute();
 
-        \Drupal::logger('spammaster-comment')->notice('Spam Master: comment block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim);
+        \Drupal::logger('spammaster-comment')->notice('Spam Master: buffer comment block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim);
       }
       // Web api check.
       else {
@@ -147,7 +134,7 @@ class SpamMasterCommentController extends ControllerBase {
           // Web positive, throw error.
           $formstate->setErrorByName('mail', 'SPAM MASTER: ' . $spammaster_block_message);
           // Watchdog log.
-          \Drupal::logger('spammaster-comment')->notice('Spam Master: comment block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim);
+          \Drupal::logger('spammaster-comment')->notice('Spam Master: comment rbl block, Ip: ' . $spammasterip . ', Comment: ' . $result_comment_content_trim);
           $spammaster_total_block_count_1 = ++$spammaster_total_block_count;
           \Drupal::configFactory()->getEditable('spammaster.settings')
             ->set('spammaster.total_block_count', $spammaster_total_block_count_1)
