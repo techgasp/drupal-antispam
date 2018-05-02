@@ -56,7 +56,7 @@ class SpamMasterContactController extends ControllerBase {
             'threat' => $spammasterip,
           ])->execute();
         }
-        if (empty($spammasteremail)) {
+        if (empty($spammasteremail) || is_array($spammasteremail)) {
           $spammasteremail = "Spam Bot";
         }
         $spammaster_db_email = \Drupal::database()->select('spammaster_threats', 'u');
@@ -88,7 +88,7 @@ class SpamMasterContactController extends ControllerBase {
         // Create data to be posted.
         $blog_license_key = $spammaster_license;
         $blog_threat_type = 'contact-form';
-        if (empty($spammasteremail)) {
+        if (empty($spammasteremail) || is_array($spammasteremail)) {
           $spammasteremail = "Spam Bot";
         }
         $blog_threat_email = $spammasteremail;

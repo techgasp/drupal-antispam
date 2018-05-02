@@ -651,7 +651,7 @@ function spammaster_comment_validate(&$form, &$form_state) {
   $spammasterip = \Drupal::request()->getClientIp();
   $spammasteremail = $form_state->getValue('mail');
   $formstate = $form_state;
-  if (empty($spammasteremail)) {
+  if (empty($spammasteremail) || is_array($spammasteremail)) {
     $spammasteremail = 'drup@' . date('Ymdhis') . '.drup';
   }
   $spammastercomment = $form_state->getValue('comment_body')[0]['value'];

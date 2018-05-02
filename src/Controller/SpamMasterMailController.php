@@ -323,6 +323,18 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $spam_master_warning = 'Warnings: Malfunction 2, urgently update Spam Master, your installed version is extremely old.';
       $spam_master_warning_signature = 'Please correct the warnings.';
     }
+    if ($response_key == 'MALFUNCTION_3') {
+      $spam_master_warning = 'Warning: Malfunction 3, get in touch with TechGasp support..';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'EXPIRED') {
+      $spam_master_warning = 'Warning: your license is EXPIRED and you are not protected.';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'INACTIVE') {
+      $spam_master_warning = 'Warning: Spam Master is Inactive, you are not protected.';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
     $spammaster_license_protection = $spammaster_settings->get('spammaster.license_protection');
     $spammaster_license_probability = $spammaster_settings->get('spammaster.license_probability');
     $spammaster_license_alert_level = $spammaster_settings->get('spammaster.license_alert_level');
@@ -427,6 +439,18 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     }
     if ($response_key == 'MALFUNCTION_2') {
       $spam_master_warning = 'Warnings: Malfunction 2, urgently update Spam Master, your installed version is extremely old.';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'MALFUNCTION_3') {
+      $spam_master_warning = 'Warning: Malfunction 3, get in touch with TechGasp support..';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'EXPIRED') {
+      $spam_master_warning = 'Warning: your license is EXPIRED and you are not protected.';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'INACTIVE') {
+      $spam_master_warning = 'Warning: Spam Master is Inactive, you are not protected.';
       $spam_master_warning_signature = 'Please correct the warnings.';
     }
     $spammaster_license_protection = $spammaster_settings->get('spammaster.license_protection');
@@ -634,6 +658,18 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
     }
     if ($response_key == 'MALFUNCTION_2') {
       $spam_master_warning = 'Warnings: Malfunction 2, urgently update Spam Master, your installed version is extremely old.';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'MALFUNCTION_3') {
+      $spam_master_warning = 'Warning: Malfunction 3, get in touch with TechGasp support..';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'EXPIRED') {
+      $spam_master_warning = 'Warning: your license is EXPIRED and you are not protected.';
+      $spam_master_warning_signature = 'Please correct the warnings.';
+    }
+    if ($response_key == 'INACTIVE') {
+      $spam_master_warning = 'Warning: Spam Master is Inactive, you are not protected.';
       $spam_master_warning_signature = 'Please correct the warnings.';
     }
     $spammaster_license_protection = $spammaster_settings->get('spammaster.license_protection');

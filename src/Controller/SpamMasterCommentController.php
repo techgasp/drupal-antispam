@@ -77,7 +77,7 @@ class SpamMasterCommentController extends ControllerBase {
         // Create data to be posted.
         $blog_license_key = $spammaster_license;
         $blog_threat_type = 'comment';
-        if (empty($spammasteremail)) {
+        if (empty($spammasteremail) || is_array($spammasteremail)) {
           $spammasteremail = 'drup@' . date('Ymdhis') . '.drup';
         }
         $blog_threat_email = $spammasteremail;
