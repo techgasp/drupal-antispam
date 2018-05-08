@@ -294,7 +294,6 @@ class SpamMasterLogForm extends ConfigFormBase {
     // Get table spammaster_keys data.
     $spammaster_spam_key = \Drupal::database()->select('spammaster_keys', 'u')
       ->fields('u', ['id', 'date', 'spamkey', 'spamvalue'])
-      ->orderBy('id', 'DESC')
       ->extend('Drupal\Core\Database\Query\TableSortExtender')->orderByHeader($header_key)
       ->extend('Drupal\Core\Database\Query\PagerSelectExtender')->limit(20)
       ->execute()->fetchAll();

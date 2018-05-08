@@ -10,6 +10,26 @@ google.charts.setOnLoadCallback(drawChart);
       var data = google.visualization.arrayToDataTable([
         ['Totals', 'Total Count', { role: 'style' }, { role: 'annotation' }],
         ['Total Blocks', {{ total_count }}, '#c2c0bf', {{ total_count }}],
+      ]);
+
+      var options = {
+        title: "Total since beginning of time",
+        bar: {groupWidth: '95%'},
+        legend: { position: 'none' },
+      };
+
+      var chart = new google.visualization.BarChart(document.getElementById('total_count'));
+      chart.draw(data, options);
+    }
+</script>
+
+<script type="text/javascript">
+google.charts.load('current', {packages: ['corechart', 'bar']});
+google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+        ['Totals', 'Total Count', { role: 'style' }, { role: 'annotation' }],
         ['Firewall', {{ total_count_firewall }}, '#3366cc', {{ total_count_firewall }}],
         ['Registration', {{ total_count_registration }}, '#dc3912', {{ total_count_registration }}],
         ['Comment', {{ total_count_comment }}, '#ff9900', {{ total_count_comment }}],
@@ -96,6 +116,11 @@ var chart = new google.visualization.LineChart(document.getElementById('5_days')
  chart.draw(data, options);
 }
 </script>
+
+<div id="total_count" style="width: 100%; height: 150px;"></div>
+
+<div class="spammaster_fw_footer">
+</div>
 
 <div id="last_3_months_total" style="width: 100%; height: 350px;"></div>
 

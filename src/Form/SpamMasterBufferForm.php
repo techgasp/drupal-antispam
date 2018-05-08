@@ -83,7 +83,7 @@ class SpamMasterBufferForm extends ConfigFormBase {
     // Get table spammaster_threats data.
     $spammaster_spam_buffer = \Drupal::database()->select('spammaster_threats', 'u')
       ->fields('u', ['id', 'date', 'threat'])
-      ->orderBy('id', 'DESC')
+      ->extend('Drupal\Core\Database\Query\TableSortExtender')->orderByHeader($header)
       ->extend('Drupal\Core\Database\Query\PagerSelectExtender')->limit(20)
       ->execute()->fetchAll();
 
