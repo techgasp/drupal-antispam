@@ -1,67 +1,103 @@
-INTRODUCTION
---------
+CONTENTS OF THIS FILE
+---------------------
 
-Spam Master protection module for drupal blocks new user registrations, comments
- and threads using Real Time anti-spam lists as Saas.
+ * Introduction
+ * Features
+ * Requirements
+ * Recommended Modules
+ * Installation
+ * Configuration
+ * Maintainers
+
+
+INTRODUCTION
+------------
+
+The Spam Master Protection module for drupal blocks new user registrations,
+comments and threads using Real Time anti-spam lists as Saas.
+
+ * For a full description of the module visit:
+   https://www.drupal.org/project/spammaster
+
+ * To submit bug reports and feature suggestions, or to track changes visit:
+   https://www.drupal.org/project/issues/spammaster
 
 
 FEATURES
 --------
 
-Protects Drupal from User Registrations
-Protects Drupal Comments
-Protects Drupal Forum Threads
-Protects Drupal Pages and Posts
-Spam Master checks for emails, domains, ip's and words
-Uses real time scan from millions of known spamming sources
-Includes Statistical information to keep your life easy
-Spam Master Learning makes your Drupal an Anti-Spam enforcer
-Spam Master allows you to customize the frontend blocked registration message
-Spam Master allows you to hide the website field from your theme comments form
-Spam Master includes Character Blocking,
- option to individually activate russian, chinese, asian, arabic characters
-Spam Master includes the famous Google reCAPTCHAs
-Spam Master includes Honeypot fields for registration, login or comments forms
-Spam Master includes Firewall technology
-Spam Master includes Signatures
-Spam Master includes a brand new automatic Threat Alert Level
-Spam Master includes Spam Activity Probability
-Spam Master includes a bunch of useful blocks
-Spam Master includes several optional email reports and warnings
-Spam Master is Contact Form Ready
-Spam Master is PHP 7 ready
-Spam Master is IPv6 ready
+ * Protects Drupal from User Registrations
+ * Protects Drupal Comments
+ * Protects Drupal Forum Threads
+ * Protects Drupal Pages and Posts
+ * Checks for emails, domains, ip's, and words
+ * Uses real time scan from millions of known spamming sources
+ * Includes Statistical information
+ * Spam Master Learning makes your Drupal an Anti-Spam enforcer
+ * Allows the user to customize the frontend blocked registration message
+ * Allows the user to hide the website field from the theme comments form
+ * Includes Character Blocking option to individually activate Russian, Chinese,
+   Asian, and Arabic characters
+ * Includes the famous Google reCAPTCHAs
+ * Includes Honeypot fields for registration, login, or comments forms
+ * Includes Firewall technology
+ * Includes Signatures
+ * Includes a brand new automatic Threat Alert Level
+ * Includes Spam Activity Probability
+ * Includes a bunch of useful blocks
+ * Includes several optional email reports and warnings
+ * Contact Form Ready
+ * PHP 7 ready
+ * IPv6 ready
+
 
 REQUIREMENTS
 ------------
 
-This module requires the following modules:
+This module requires no modules outside of Drupal core.
 
- No extra requirements are necessary to install or run the module
+
+RECOMMENDED MODULES
+-------------------
+
+To utilize this service completely, a valid license key is required.
+
+ * https://wordpress.techgasp.com/spam-master/
+
 
 INSTALLATION
 ------------
 
-Install as you would normally install a contributed Drupal module. Visit:
-   https://drupal.org/documentation/install/modules-themes/modules-8
-   for further information.
+ * Install the Spam Master Protection module as you would normally install a
+   contributed Drupal module. Visit https://www.drupal.org/node/1897420 for
+   further information.
+
 
 CONFIGURATION
 -------------
 
-Configuration is available via Spam Master module configuration..
-After enabling the module make sure to visit the Spam Master configuration page
- and remember to clear all caches.
+    1. Navigate to Administration > Extend and enable the module.
+    2. Navigate to Administration > Configuration > System > Spam Master
+       settings to configure the module.
+    3. On the Settings tab, pre-set module configuration is included along with
+       a trial license. When a license key is acquired enter it here. Save and
+       Refresh License.
 
-FUTURE ENHANCEMENTS
--------------------
+To configure Protection Tools:
+    1. Navigate to Administration > Configuration > System > Spam Master
+       settings > Protection Tools to configure the tools.
+    2. Block message allows the user to change the message displayed when a user
+       is blocked.
+    3. Basic Tools activates individual basic tools to implement Spam Master
+       across the site. The user can choose to activate the following scans:
+       Firewall, Registration, Comment, and Contact scans.
+    4. Extra tools allow configurations for Honeypot and Captcha services.
+    5. Signatures are a huge deterrent of human scan. The following signatures
+       can be displayed: Registration, Login, Comment, and Contact.
+    6. Emails and reports can be configured to be sent daily or weekly.
 
-Statistical Data Display.
-Scan Comments and Threads.
-Manage local spam database to delete entries.
 
 MAINTAINERS
 -----------
 
 Current maintainers:
- Pedro Alves (pedro-alves) - https://www.drupal.org/u/pedro-alves

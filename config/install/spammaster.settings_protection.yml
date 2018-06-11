@@ -1,4 +1,4 @@
-block_message: 'Your Email, Domain, or Ip are banned.'
+block_message: 'Your Email, Domain, or IP are banned.'
 basic_firewall: '1'
 basic_registration: '1'
 basic_comment: '1'

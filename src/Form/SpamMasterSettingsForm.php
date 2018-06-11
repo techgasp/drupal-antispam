@@ -116,6 +116,11 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Insert license key number:'),
       '#default_value' => $config->get('spammaster.license_key'),
       '#description' => t('Insert your license key number. <a href="@spammaster_url">Get full rbl license</a>.', ['@spammaster_url' => 'https://wordpress.techgasp.com/spam-master/']),
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive-49',
+        ],
+      ],
     ];
 
     $spammaster_lic_controller = new SpamMasterLicController();
@@ -136,6 +141,12 @@ class SpamMasterSettingsForm extends ConfigFormBase {
     // Insert license table inside tree.
     $form['license_header']['license'] = [
       '#type' => 'table',
+      '#responsive' => TRUE,
+      '#attached' => [
+        'library' => [
+          'spammaster/spammaster-styles',
+        ],
+      ],
     ];
     // Insert addrow license status field.
     $form['license_header']['license']['addrow']['license_status'] = [
@@ -164,9 +175,13 @@ class SpamMasterSettingsForm extends ConfigFormBase {
     $form['license_header']['spam']['addrow']['license_protection'] = [
       '#disabled' => TRUE,
       '#type' => 'textfield',
-      '#title' => $this->t('Your protection count:'),
+      '#title' => $this->t('Your protection count (Threats & Exploits protection number):'),
       '#default_value' => $protection_total_number_text,
-      '#description' => $this->t('Threats & Exploits protection number.'),
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive',
+        ],
+      ],
     ];
     // Insert addrow alert level field.
     $form['license_header']['spam']['addrow']['license_probability'] = [
@@ -174,7 +189,11 @@ class SpamMasterSettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Your spam probability:'),
       '#default_value' => $config->get('spammaster.license_probability') . $spammaster_alert_level_p_label,
-      '#description' => t('Your spam probability. <a href="@spammaster_url">About Spam Probability</a>.', ['@spammaster_url' => 'https://spammaster.techgasp.com/documentation/']),
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive',
+        ],
+      ],
     ];
 
     return $form;

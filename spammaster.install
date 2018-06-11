@@ -63,15 +63,15 @@ function spammaster_install() {
   $address_unclean = $spammaster_site_url;
   $address = preg_replace('#^https?://#', '', $address_unclean);
   $spammaster_admin_email = $site_settings->get('mail');
-  @$spammaster_ip = $_SERVER['SERVER_ADDR'];
+  $spammaster_ip = $_SERVER['SERVER_ADDR'];
   // If empty ip.
   if (empty($spammaster_ip) || $spammaster_ip == '0') {
-    @$spammaster_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);
+    $spammaster_ip = 'I ' . gethostbyname($_SERVER['HTTP_HOST']);
   }
-  @$spammaster_hostname = gethostbyaddr($_SERVER['SERVER_ADDR']);
+  $spammaster_hostname = gethostbyaddr($_SERVER['SERVER_ADDR']);
   // If empty host.
   if (empty($spammaster_hostname) || $spammaster_hostname == '0') {
-    @$spammaster_hostname = 'H ' . gethostbyname($_SERVER['SERVER_NAME']);
+    $spammaster_hostname = 'H ' . gethostbyname($_SERVER['HTTP_HOST']);
   }
 
   // Encode ssl post link for security.
@@ -157,7 +157,7 @@ function spammaster_schema() {
         'size' => 'normal',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => 'ID of ip or email threat.',
+        'description' => 'ID of IP or email threat.',
       ],
       'date' => [
         'type' => 'varchar',
@@ -169,14 +169,14 @@ function spammaster_schema() {
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'description' => 'Ip or email',
+        'description' => 'IP or email',
       ],
     ],
     'primary key' => ['id'],
   ];
 
   $schema['spammaster_keys'] = [
-    'description' => 'Variable, log and other info.',
+    'description' => 'Variable, log, and other info.',
     'fields' => [
       'id' => [
         'type' => 'serial',

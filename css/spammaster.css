@@ -108,3 +108,16 @@
   width: 80%;
   margin: 100px auto;
 }
+.spammaster-responsive {
+  width: 100%;
+}
+.spammaster-responsive-49 {
+  width: 49%;
+}
+@media screen and (max-width: 1025px) {
+  .spammaster-responsive-25,
+  td {
+    width: 25%;
+    display: inline;
+  }
+}

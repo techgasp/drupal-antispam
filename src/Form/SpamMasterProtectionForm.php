@@ -31,6 +31,11 @@ class SpamMasterProtectionForm extends ConfigFormBase {
     $form['protection_header'] = [
       '#type' => 'vertical_tabs',
       '#title' => t('<h3>Protection Tools</h3>'),
+      '#attached' => [
+        'library' => [
+          'spammaster/spammaster-styles',
+        ],
+      ],
     ];
 
     $form['message'] = [
@@ -44,7 +49,12 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Change block message:'),
       '#default_value' => $config->get('spammaster.block_message'),
-      '#description' => $this->t('Message to display to blocked spam users who are not allowed to register, contact or comment in your Drupal. Keep it short.'),
+      '#description' => $this->t('Message to display to blocked spam users who are not allowed to register, contact, or comment in your Drupal site. Keep it short.'),
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive-49',
+        ],
+      ],
     ];
 
     // Insert basic tools table inside tree.
@@ -52,6 +62,11 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => t('Basic Tools'),
       '#group' => 'protection_header',
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive-25',
+        ],
+      ],
     ];
 
     $form['basic']['table_1'] = [
@@ -69,7 +84,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#default_value' => $config->get('spammaster.basic_firewall'),
       '#description' => t('Set this to <em>Yes</em> if you would like the Firewall scan implemented across your site. Greatly reduces server resources like CPU and Memory.'),
     ];
-    $form['basic']['table_1']['addrow']['basic_registration'] = [
+    $form['basic']['table_1']['addrow']['spammaster-responsive-33']['basic_registration'] = [
       '#type' => 'select',
       '#title' => t('Registration Scan'),
       '#options' => [
@@ -97,7 +112,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.basic_contact'),
-      '#description' => t('Set this to <em>Yes</em> if you would like the Contact Scanto be display on the contact form.'),
+      '#description' => t('Set this to <em>Yes</em> if you would like the Contact Scan to be display on the contact form.'),
     ];
 
     // Insert Extra tools table inside tree.
@@ -105,6 +120,11 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => t('Extra Tools'),
       '#group' => 'protection_header',
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive-25',
+        ],
+      ],
     ];
 
     $form['extra']['table_2'] = [
@@ -121,7 +141,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.extra_honeypot'),
-      '#description' => t('Set this to <em>Yes</em> if you would like 2 Honeypot fields implemented across your site forms.'),
+      '#description' => t('Set this to <em>Yes</em> if you would like two Honeypot fields implemented across your site forms.'),
     ];
     $form['extra']['table_2']['addrow']['extra_recaptcha'] = [
       '#type' => 'select',
@@ -139,6 +159,11 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#title' => $this->t('Google re-Captcha API Site Key:'),
       '#default_value' => $config->get('spammaster.extra_recaptcha_api_key'),
       '#description' => $this->t('Insert your Google re-Captcha api key.'),
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive',
+        ],
+      ],
     ];
     // Insert addrow re-captcha secrete key.
     $form['extra']['table_2']['addrow']['extra_recaptcha_api_secret_key'] = [
@@ -146,6 +171,11 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#title' => $this->t('Google re-Captcha API Secret Key:'),
       '#default_value' => $config->get('spammaster.extra_recaptcha_api_secret_key'),
       '#description' => $this->t('Insert your Google re-Captcha api secret key.'),
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive',
+        ],
+      ],
     ];
 
     $form['extra']['table_3'] = [
@@ -195,7 +225,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
 
     $form['extra']['table_3']['addrow1']['extra_honeypot_login'] = [
       '#type' => 'select',
-      '#title' => t('honeypot on Login Form'),
+      '#title' => t('Honeypot on Login Form'),
       '#options' => [
         0 => t('No'),
         1 => t('Yes'),
@@ -205,7 +235,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
     ];
     $form['extra']['table_3']['addrow1']['extra_honeypot_registration'] = [
       '#type' => 'select',
-      '#title' => t('honeypot on Registration Form'),
+      '#title' => t('Honeypot on Registration Form'),
       '#options' => [
         0 => t('No'),
         1 => t('Yes'),
@@ -215,7 +245,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
     ];
     $form['extra']['table_3']['addrow1']['extra_honeypot_comment'] = [
       '#type' => 'select',
-      '#title' => t('honeypot on Comment Form'),
+      '#title' => t('Honeypot on Comment Form'),
       '#options' => [
         0 => t('No'),
         1 => t('Yes'),
@@ -225,7 +255,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
     ];
     $form['extra']['table_3']['addrow1']['extra_honeypot_contact'] = [
       '#type' => 'select',
-      '#title' => t('honeypot on Contact Form'),
+      '#title' => t('Honeypot on Contact Form'),
       '#options' => [
         0 => t('No'),
         1 => t('Yes'),
@@ -239,11 +269,16 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => t('Signatures'),
       '#group' => 'protection_header',
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive-25',
+        ],
+      ],
     ];
     $form['signature']['table_4'] = [
       '#type' => 'table',
       '#header' => [
-          ['data' => 'Signtures are a huge deterrent against all forms of human span.', 'colspan' => 4],
+          ['data' => 'Signatures are a huge deterrent against all forms of human spam.', 'colspan' => 4],
       ],
     ];
     $form['signature']['table_4']['addrow']['signature_registration'] = [
@@ -264,7 +299,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.signature_login'),
-      '#description' => t('Set this to <em>Yes</em> if you would like a Protection Signature to be display on the login form.'),
+      '#description' => t('Set this to <em>Yes</em> if you would like a Protection Signature to be displayed on the login form.'),
     ];
     $form['signature']['table_4']['addrow']['signature_comment'] = [
       '#type' => 'select',
@@ -274,7 +309,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.signature_comment'),
-      '#description' => t('Set this to <em>Yes</em> if you would like a Protection Signature to be display on the comment form.'),
+      '#description' => t('Set this to <em>Yes</em> if you would like a Protection Signature to be displayed on the comment form.'),
     ];
     $form['signature']['table_4']['addrow']['signature_contact'] = [
       '#type' => 'select',
@@ -284,7 +319,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.signature_contact'),
-      '#description' => t('Set this to <em>Yes</em> if you would like a Protection Signature to be display on the contact form.'),
+      '#description' => t('Set this to <em>Yes</em> if you would like a Protection Signature to be displayed on the contact form.'),
     ];
 
     // Insert email tools table inside tree.
@@ -292,6 +327,11 @@ class SpamMasterProtectionForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => t('Emails & Reports'),
       '#group' => 'protection_header',
+      '#attributes' => [
+        'class' => [
+          'spammaster-responsive-25',
+        ],
+      ],
     ];
     $form['email']['table_5'] = [
       '#type' => 'table',
@@ -307,7 +347,7 @@ class SpamMasterProtectionForm extends ConfigFormBase {
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.email_alert_3'),
-      '#description' => t('Set this to <em>Yes</em> to receive the alert 3 email. Only sent if your website reached or is at a dangerous level.'),
+      '#description' => t('Set this to <em>Yes</em> to receive the alert 3 email. Only sent if your website has reached or is at a dangerous level.'),
     ];
     $form['email']['table_5']['addrow']['email_daily_report'] = [
       '#type' => 'select',
@@ -331,13 +371,13 @@ class SpamMasterProtectionForm extends ConfigFormBase {
     ];
     $form['email']['table_5']['addrow']['email_improve'] = [
       '#type' => 'select',
-      '#title' => t('Help Us Improve Spam Master'),
+      '#title' => t('Help us improve Spam Master'),
       '#options' => [
         0 => t('No'),
         1 => t('Yes'),
       ],
       '#default_value' => $config->get('spammaster.email_improve'),
-      '#description' => t('Set this to <em>Yes</em> to help Us improve Spam Master with weekly statistical data, same as your weekly report.'),
+      '#description' => t('Set this to <em>Yes</em> to help us improve Spam Master with weekly statistical data, same as your weekly report.'),
     ];
 
     return $form;

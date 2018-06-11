@@ -55,7 +55,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
 
       \Drupal::logger('spammaster-license')->notice('Spam Master: congratulations! trial license created.');
 
-      \Drupal::logger('spammaster-mail')->notice('Spam Master: mail trial license created sent To: ' . $to);
+      \Drupal::logger('spammaster-mail')->notice('Spam Master: mail trial license created sent to: ' . $to);
 
       $spammaster_db_lic_insert = db_insert('spammaster_keys')->fields([
         'date' => $spammaster_date,
@@ -66,7 +66,7 @@ class SpamMasterMailController extends ControllerBase implements ContainerInject
       $spammaster_db_mail_insert = db_insert('spammaster_keys')->fields([
         'date' => $spammaster_date,
         'spamkey' => 'spammaster-mail',
-        'spamvalue' => 'Spam Master: mail trial license created sent To:' . $to,
+        'spamvalue' => 'Spam Master: mail trial license created sent to:' . $to,
       ])->execute();
     }
     else {

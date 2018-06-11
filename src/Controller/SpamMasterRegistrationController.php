@@ -52,9 +52,14 @@ class SpamMasterRegistrationController extends ControllerBase {
             'threat' => $spammasterip,
           ])->execute();
         }
-        if (empty($spammasteremail) || is_array($spammasteremail)) {
+        if (empty($spammasteremail)) {
           $spammasteremail = "Spam Bot";
         }
+        $valid_email = filter_var($spammasteremail, FILTER_VALIDATE_EMAIL);
+        if (is_array($spammasteremail) || $valid_email == FALSE) {
+          $spammasteremail = "Spam Bot";
+        }
+
         $spammaster_db_email = \Drupal::database()->select('spammaster_threats', 'u');
         $spammaster_db_email->fields('u', ['threat']);
         $spammaster_db_email->where('(threat = :email)', [':email' => $spammasteremail]);
@@ -84,10 +89,16 @@ class SpamMasterRegistrationController extends ControllerBase {
         // Create data to be posted.
         $blog_license_key = $spammaster_license;
         $blog_threat_type = 'registration';
-        if (empty($spammasteremail) || is_array($spammasteremail)) {
+        // Check if email is valid.
+        if (empty($spammasteremail)) {
+          $spammasteremail = "Spam Bot";
+        }
+        $valid_email = filter_var($spammasteremail, FILTER_VALIDATE_EMAIL);
+        if (is_array($spammasteremail) || $valid_email == FALSE) {
           $spammasteremail = "Spam Bot";
         }
         $blog_threat_email = $spammasteremail;
+
         $blog_threat_content = 'registration';
         $blog_web_address = \Drupal::request()->getHost();
         $address_unclean = $blog_web_address;

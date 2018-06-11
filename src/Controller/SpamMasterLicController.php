@@ -36,12 +36,12 @@ class SpamMasterLicController extends ControllerBase {
     $spammaster_ip = $_SERVER['SERVER_ADDR'];
     // If empty ip.
     if (empty($spammaster_ip) || $spammaster_ip == '0') {
-      @$spammaster_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);
+      $spammaster_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);
     }
     $spammaster_hostname = gethostbyaddr($_SERVER['SERVER_ADDR']);
     // If empty host.
     if (empty($spammaster_hostname) || $spammaster_hostname == '0') {
-      @$spammaster_hostname = 'H ' . gethostbyname($_SERVER['SERVER_NAME']);
+      $spammaster_hostname = 'H ' . gethostbyname($_SERVER['SERVER_NAME']);
     }
 
     // Encode ssl post link security.
@@ -156,12 +156,12 @@ class SpamMasterLicController extends ControllerBase {
       $spammaster_ip = $_SERVER['SERVER_ADDR'];
       // If empty ip.
       if (empty($spammaster_ip) || $spammaster_ip == '0') {
-        @$spammaster_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);
+        $spammaster_ip = 'I ' . gethostbyname($_SERVER['SERVER_NAME']);
       }
-      @$spammaster_hostname = gethostbyaddr($_SERVER['SERVER_ADDR']);
+      $spammaster_hostname = gethostbyaddr($_SERVER['SERVER_ADDR']);
       // If empty host.
       if (empty($spammaster_hostname) || $spammaster_hostname == '0') {
-        @$spammaster_hostname = 'H ' . gethostbyname($_SERVER['SERVER_NAME']);
+        $spammaster_hostname = 'H ' . gethostbyname($_SERVER['SERVER_NAME']);
       }
 
       // Encode ssl post link security.
